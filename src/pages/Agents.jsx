@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Sparkles } from 'lucide-react';
+import { Menu, Sparkles, Workflow as WorkflowIcon } from 'lucide-react';
 import AgentCard from '../components/agents/AgentCard';
 import ConversationList from '../components/agents/ConversationList';
 import ChatWindow from '../components/agents/ChatWindow';
