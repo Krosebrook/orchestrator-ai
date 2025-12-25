@@ -40,7 +40,6 @@ export default function HRDashboard({ user }) {
                 </Button>
             </div>
 
-            {/* KPIs */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <Card>
                     <CardContent className="pt-6">
@@ -88,7 +87,6 @@ export default function HRDashboard({ user }) {
                 </Card>
             </div>
 
-            {/* Department Breakdown */}
             <Card>
                 <CardHeader>
                     <CardTitle>Department Overview</CardTitle>
@@ -108,7 +106,6 @@ export default function HRDashboard({ user }) {
                 </CardContent>
             </Card>
 
-            {/* Employee List */}
             <Card>
                 <CardHeader>
                     <CardTitle>Recent Employees</CardTitle>

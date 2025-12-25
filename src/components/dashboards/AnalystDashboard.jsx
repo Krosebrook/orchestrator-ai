@@ -32,7 +32,6 @@ export default function AnalystDashboard({ user }) {
                 <p className="text-slate-600">Business intelligence and analytics</p>
             </div>
 
-            {/* Summary KPIs */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <Card>
                     <CardContent className="pt-6">
@@ -82,7 +81,6 @@ export default function AnalystDashboard({ user }) {
                 </Card>
             </div>
 
-            {/* Metrics by Category */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {categories.map((category) => {
                     const categoryMetrics = getMetricsByCategory(category);

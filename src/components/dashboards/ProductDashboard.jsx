@@ -50,7 +50,6 @@ export default function ProductDashboard({ user }) {
                 </Button>
             </div>
 
-            {/* KPIs */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <Card>
                     <CardContent className="pt-6">
@@ -98,7 +97,6 @@ export default function ProductDashboard({ user }) {
                 </Card>
             </div>
 
-            {/* Feature List */}
             <Card>
                 <CardHeader>
                     <CardTitle>Feature Roadmap</CardTitle>

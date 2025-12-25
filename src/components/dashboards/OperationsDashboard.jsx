@@ -42,7 +42,6 @@ export default function OperationsDashboard({ user }) {
                 <p className="text-slate-600">Process efficiency and workflow monitoring</p>
             </div>
 
-            {/* KPIs */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <Card>
                     <CardContent className="pt-6">
@@ -90,7 +89,6 @@ export default function OperationsDashboard({ user }) {
                 </Card>
             </div>
 
-            {/* Workflows Status */}
             <Card>
                 <CardHeader>
                     <CardTitle>Active Workflows</CardTitle>
@@ -116,7 +114,6 @@ export default function OperationsDashboard({ user }) {
                 </CardContent>
             </Card>
 
-            {/* Recent Executions */}
             <Card>
                 <CardHeader>
                     <CardTitle>Recent Workflow Executions</CardTitle>

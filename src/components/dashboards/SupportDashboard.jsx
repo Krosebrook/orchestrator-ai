@@ -59,7 +59,6 @@ export default function SupportDashboard({ user }) {
                 </Button>
             </div>
 
-            {/* KPIs */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <Card>
                     <CardContent className="pt-6">
@@ -107,7 +106,6 @@ export default function SupportDashboard({ user }) {
                 </Card>
             </div>
 
-            {/* Tickets */}
             <Card>
                 <CardHeader>
                     <CardTitle>Recent Tickets</CardTitle>
