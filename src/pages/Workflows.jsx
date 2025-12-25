@@ -8,6 +8,8 @@ import { Plus, Search, Sparkles, Workflow as WorkflowIcon } from 'lucide-react';
 import WorkflowCard from '../components/workflows/WorkflowCard';
 import WorkflowBuilder from '../components/workflows/WorkflowBuilder';
 import WorkflowExecutionView from '../components/workflows/WorkflowExecutionView';
+import WorkflowTemplates from '../components/workflows/WorkflowTemplates';
+import TemplateConfigDialog from '../components/workflows/TemplateConfigDialog';
 import { toast } from 'sonner';
 
 export default function WorkflowsPage() {
@@ -20,6 +22,7 @@ export default function WorkflowsPage() {
     const [executingWorkflow, setExecutingWorkflow] = useState(null);
     const [currentExecution, setCurrentExecution] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [selectedTemplate, setSelectedTemplate] = useState(null);
 
     useEffect(() => {
         loadData();
@@ -242,8 +245,12 @@ export default function WorkflowsPage() {
                 </div>
 
                 {/* Tabs */}
-                <Tabs defaultValue="workflows" className="space-y-6">
+                <Tabs defaultValue="templates" className="space-y-6">
                     <TabsList className="bg-white">
+                        <TabsTrigger value="templates">
+                            <Sparkles className="h-4 w-4 mr-2" />
+                            Templates
+                        </TabsTrigger>
                         <TabsTrigger value="workflows">
                             <WorkflowIcon className="h-4 w-4 mr-2" />
                             My Workflows
@@ -253,6 +260,14 @@ export default function WorkflowsPage() {
                             Executions
                         </TabsTrigger>
                     </TabsList>
+
+                    {/* Templates Tab */}
+                    <TabsContent value="templates">
+                        <WorkflowTemplates
+                            agents={agents}
+                            onUseTemplate={setSelectedTemplate}
+                        />
+                    </TabsContent>
 
                     {/* Workflows Tab */}
                     <TabsContent value="workflows" className="space-y-6">
@@ -371,6 +386,18 @@ export default function WorkflowsPage() {
                     )}
                 </DialogContent>
             </Dialog>
+
+            {/* Template Configuration Dialog */}
+            <TemplateConfigDialog
+                template={selectedTemplate}
+                agents={agents}
+                open={!!selectedTemplate}
+                onClose={() => setSelectedTemplate(null)}
+                onCreate={async (workflowData) => {
+                    await handleSaveWorkflow(workflowData);
+                    setSelectedTemplate(null);
+                }}
+            />
         </div>
     );
 }
