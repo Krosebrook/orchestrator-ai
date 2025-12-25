@@ -133,6 +133,14 @@ export default function AgentsPage() {
                             <p className="text-sm text-slate-500">Manage your AI agents</p>
                         </div>
                     </div>
+                    <Button
+                        onClick={() => window.location.href = '/Workflows'}
+                        variant="outline"
+                        className="hidden md:flex"
+                    >
+                        <WorkflowIcon className="h-4 w-4 mr-2" />
+                        Workflows
+                    </Button>
                 </div>
             </div>
 
