@@ -16,14 +16,50 @@ import {
     Database,
     Webhook,
     Key,
-    Zap
+    Zap,
+    Trash2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from "@/lib/utils";
+import ConnectionDialog from '../components/integrations/ConnectionDialog';
 
 export default function IntegrationsPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState('available');
+    const [connections, setConnections] = useState([]);
+    const [user, setUser] = useState(null);
+    const [selectedIntegration, setSelectedIntegration] = useState(null);
+    const [showConnectionDialog, setShowConnectionDialog] = useState(false);
+
+    useEffect(() => {
+        loadUserAndConnections();
+    }, []);
+
+    const loadUserAndConnections = async () => {
+        try {
+            const currentUser = await base44.auth.me();
+            setUser(currentUser);
+
+            const userConnections = await base44.entities.IntegrationConnection.filter({
+                user_email: currentUser.email
+            });
+            setConnections(userConnections || []);
+        } catch (error) {
+            console.error('Failed to load connections:', error);
+        }
+    };
+
+    const isConnected = (integrationId) => {
+        return connections.some(
+            conn => conn.integration_id === integrationId && conn.status === 'active'
+        );
+    };
+
+    const getConnection = (integrationId) => {
+        return connections.find(
+            conn => conn.integration_id === integrationId && conn.status === 'active'
+        );
+    };
 
     const integrations = [
         {
@@ -151,10 +187,25 @@ export default function IntegrationsPage() {
             return;
         }
         
-        if (integration.type === 'oauth') {
-            toast.info(`OAuth connection for ${integration.name} would be initiated here`);
-        } else {
-            toast.info(`API key configuration for ${integration.name} would open here`);
+        setSelectedIntegration(integration);
+        setShowConnectionDialog(true);
+    };
+
+    const handleDisconnect = async (integration) => {
+        if (!confirm(`Disconnect ${integration.name}?`)) return;
+
+        try {
+            const connection = getConnection(integration.id);
+            if (connection) {
+                await base44.entities.IntegrationConnection.update(connection.id, {
+                    status: 'revoked'
+                });
+                toast.success(`${integration.name} disconnected`);
+                await loadUserAndConnections();
+            }
+        } catch (error) {
+            console.error('Failed to disconnect:', error);
+            toast.error('Failed to disconnect');
         }
     };
 
@@ -202,7 +253,9 @@ export default function IntegrationsPage() {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-slate-600">Connected</p>
-                                    <p className="text-3xl font-bold text-slate-800">0</p>
+                                    <p className="text-3xl font-bold text-slate-800">
+                                        {connections.filter(c => c.status === 'active').length}
+                                    </p>
                                 </div>
                                 <Zap className="h-10 w-10 text-orange-600" />
                             </div>
@@ -314,21 +367,38 @@ export default function IntegrationsPage() {
                                                         {integration.category}
                                                     </Badge>
                                                 </div>
-                                                <Button
-                                                    className="w-full mt-4"
-                                                    variant={integration.status === 'available' ? 'default' : 'outline'}
-                                                    onClick={() => handleConnect(integration)}
-                                                    disabled={integration.status === 'coming_soon'}
-                                                >
-                                                    {integration.status === 'available' ? (
-                                                        <>
-                                                            <Plus className="h-4 w-4 mr-2" />
-                                                            Connect
-                                                        </>
-                                                    ) : (
-                                                        'Coming Soon'
-                                                    )}
-                                                </Button>
+                                                {isConnected(integration.id) ? (
+                                                    <div className="space-y-2 mt-4">
+                                                        <div className="flex items-center gap-2 p-2 bg-green-50 rounded-lg border border-green-200">
+                                                            <CheckCircle className="h-4 w-4 text-green-600" />
+                                                            <span className="text-sm text-green-700 font-medium">Connected</span>
+                                                        </div>
+                                                        <Button
+                                                            variant="outline"
+                                                            className="w-full text-red-600 hover:bg-red-50"
+                                                            onClick={() => handleDisconnect(integration)}
+                                                        >
+                                                            <Trash2 className="h-4 w-4 mr-2" />
+                                                            Disconnect
+                                                        </Button>
+                                                    </div>
+                                                ) : (
+                                                    <Button
+                                                        className="w-full mt-4"
+                                                        variant={integration.status === 'available' ? 'default' : 'outline'}
+                                                        onClick={() => handleConnect(integration)}
+                                                        disabled={integration.status === 'coming_soon'}
+                                                    >
+                                                        {integration.status === 'available' ? (
+                                                            <>
+                                                                <Plus className="h-4 w-4 mr-2" />
+                                                                Connect
+                                                            </>
+                                                        ) : (
+                                                            'Coming Soon'
+                                                        )}
+                                                    </Button>
+                                                )}
                                             </div>
                                         </CardContent>
                                     </Card>
@@ -359,6 +429,17 @@ export default function IntegrationsPage() {
                         </div>
                     </CardContent>
                 </Card>
+
+                {/* Connection Dialog */}
+                <ConnectionDialog
+                    open={showConnectionDialog}
+                    onClose={() => {
+                        setShowConnectionDialog(false);
+                        setSelectedIntegration(null);
+                    }}
+                    integration={selectedIntegration}
+                    onConnected={loadUserAndConnections}
+                />
             </div>
         </div>
     );
