@@ -3,7 +3,8 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { LayoutDashboard, User } from 'lucide-react';
+import { LayoutDashboard, User, Settings } from 'lucide-react';
+import DashboardCustomizer from '../components/dashboards/DashboardCustomizer';
 import ExecutiveDashboard from '../components/dashboards/ExecutiveDashboard';
 import MarketingDashboard from '../components/dashboards/MarketingDashboard';
 import SalesDashboard from '../components/dashboards/SalesDashboard';
@@ -33,6 +34,8 @@ export default function DashboardPage() {
     const [userProfile, setUserProfile] = useState(null);
     const [selectedPersona, setSelectedPersona] = useState('executive');
     const [loading, setLoading] = useState(true);
+    const [showCustomizer, setShowCustomizer] = useState(false);
+    const [dashboardLayout, setDashboardLayout] = useState(null);
 
     useEffect(() => {
         loadUserData();
@@ -102,6 +105,14 @@ export default function DashboardPage() {
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowCustomizer(true)}
+                        >
+                            <Settings className="h-4 w-4 mr-2" />
+                            Customize
+                        </Button>
                         <Select value={selectedPersona} onValueChange={handlePersonaChange}>
                             <SelectTrigger className="w-64">
                                 <User className="h-4 w-4 mr-2" />
@@ -133,6 +144,13 @@ export default function DashboardPage() {
                         </CardContent>
                     </Card>
                 )}
+
+                <DashboardCustomizer
+                    open={showCustomizer}
+                    onClose={() => setShowCustomizer(false)}
+                    onSave={(layout) => setDashboardLayout(layout)}
+                    currentLayout={dashboardLayout}
+                />
             </div>
         </div>
     );
