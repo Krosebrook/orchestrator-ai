@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Plus, Search, Sparkles, Workflow as WorkflowIcon } from 'lucide-react';
 import WorkflowCard from '../components/workflows/WorkflowCard';
 import WorkflowBuilder from '../components/workflows/WorkflowBuilder';
+import VisualWorkflowBuilder from '../components/workflows/VisualWorkflowBuilder';
 import WorkflowExecutionView from '../components/workflows/WorkflowExecutionView';
 import WorkflowTemplates from '../components/workflows/WorkflowTemplates';
 import TemplateConfigDialog from '../components/workflows/TemplateConfigDialog';
@@ -356,8 +357,8 @@ export default function WorkflowsPage() {
                         <DialogTitle>
                             {editingWorkflow ? 'Edit Workflow' : 'Create New Workflow'}
                         </DialogTitle>
-                    </DialogHeader>
-                    <WorkflowBuilder
+                        </DialogHeader>
+                        <VisualWorkflowBuilder
                         workflow={editingWorkflow}
                         agents={agents}
                         onSave={handleSaveWorkflow}
@@ -365,7 +366,7 @@ export default function WorkflowsPage() {
                             setShowBuilder(false);
                             setEditingWorkflow(null);
                         }}
-                    />
+                        />
                 </DialogContent>
             </Dialog>
 
