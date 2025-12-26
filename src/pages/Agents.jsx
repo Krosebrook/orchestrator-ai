@@ -14,6 +14,9 @@ export default function AgentsPage() {
     const [selectedConversation, setSelectedConversation] = useState(null);
     const [loading, setLoading] = useState(true);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [versionManagerOpen, setVersionManagerOpen] = useState(false);
+    const [selectedAgentForVersions, setSelectedAgentForVersions] = useState(null);
+    const [showCapabilities, setShowCapabilities] = useState(false);
 
     useEffect(() => {
         loadAgents();
