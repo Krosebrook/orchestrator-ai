@@ -4,6 +4,7 @@ import Integrations from './pages/Integrations';
 import Landing from './pages/Landing';
 import Workflows from './pages/Workflows';
 import Deployments from './pages/Deployments';
+import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
@@ -18,4 +19,5 @@ export const PAGES = {
 export const pagesConfig = {
     mainPage: "Agents",
     Pages: PAGES,
+    Layout: __Layout,
 };
