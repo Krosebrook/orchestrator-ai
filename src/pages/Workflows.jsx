@@ -382,6 +382,33 @@ export default function WorkflowsPage() {
                         <WorkflowExecutionView
                             execution={currentExecution}
                             workflow={executingWorkflow}
+                            onRefresh={async () => {
+                                const updated = await base44.entities.WorkflowExecution.filter({ id: currentExecution.id });
+                                if (updated && updated.length > 0) {
+                                    setCurrentExecution(updated[0]);
+                                }
+                            }}
+                            onRetry={async (stepIndexOrAll, params) => {
+                                if (stepIndexOrAll === 'all') {
+                                    await handleExecuteWorkflow(executingWorkflow);
+                                } else {
+                                    toast.info('Step retry functionality coming soon');
+                                }
+                            }}
+                            onPause={async () => {
+                                await base44.entities.WorkflowExecution.update(currentExecution.id, {
+                                    status: 'paused'
+                                });
+                                const updated = await base44.entities.WorkflowExecution.filter({ id: currentExecution.id });
+                                setCurrentExecution(updated[0]);
+                            }}
+                            onResume={async () => {
+                                await base44.entities.WorkflowExecution.update(currentExecution.id, {
+                                    status: 'running'
+                                });
+                                const updated = await base44.entities.WorkflowExecution.filter({ id: currentExecution.id });
+                                setCurrentExecution(updated[0]);
+                            }}
                         />
                     )}
                 </DialogContent>

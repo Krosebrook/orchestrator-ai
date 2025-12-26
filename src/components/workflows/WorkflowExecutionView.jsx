@@ -4,13 +4,20 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Circle, Loader2, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { CheckCircle2, Circle, Loader2, AlertCircle, ArrowRight, Sparkles, Play, Pause, RotateCcw, FileText, XCircle, RefreshCw } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { toast } from 'sonner';
 import MessageBubble from '../agents/MessageBubble';
 
-export default function WorkflowExecutionView({ execution, workflow }) {
+export default function WorkflowExecutionView({ execution, workflow, onRefresh, onRetry, onPause, onResume }) {
     const [stepConversations, setStepConversations] = useState({});
     const [loading, setLoading] = useState(false);
+    const [showLogs, setShowLogs] = useState({});
+    const [retryParams, setRetryParams] = useState({});
+    const [showRetryDialog, setShowRetryDialog] = useState(null);
+    const [executionLogs, setExecutionLogs] = useState([]);
 
     useEffect(() => {
         if (execution?.step_results) {
@@ -20,7 +27,18 @@ export default function WorkflowExecutionView({ execution, workflow }) {
                 }
             });
         }
-    }, [execution?.step_results]);
+
+        // Simulate execution logs
+        generateExecutionLogs();
+        
+        // Auto-refresh every 3 seconds if running
+        if (execution?.status === 'running' && onRefresh) {
+            const interval = setInterval(() => {
+                onRefresh();
+            }, 3000);
+            return () => clearInterval(interval);
+        }
+    }, [execution?.step_results, execution?.status]);
 
     const loadStepConversation = async (conversationId) => {
         try {
@@ -74,6 +92,85 @@ export default function WorkflowExecutionView({ execution, workflow }) {
         return result?.output;
     };
 
+    const generateExecutionLogs = () => {
+        const logs = [];
+        logs.push({ timestamp: new Date(execution?.created_date).toISOString(), level: 'info', message: `Workflow "${workflow?.name}" started` });
+        
+        execution?.step_results?.forEach((result, index) => {
+            logs.push({ 
+                timestamp: result.started_at || new Date().toISOString(), 
+                level: 'info', 
+                message: `Step ${index + 1} (${result.agent_name}) started` 
+            });
+            
+            if (result.status === 'completed') {
+                logs.push({ 
+                    timestamp: result.completed_at || new Date().toISOString(), 
+                    level: 'success', 
+                    message: `Step ${index + 1} completed successfully` 
+                });
+            } else if (result.status === 'failed') {
+                logs.push({ 
+                    timestamp: result.completed_at || new Date().toISOString(), 
+                    level: 'error', 
+                    message: `Step ${index + 1} failed: ${result.error || 'Unknown error'}` 
+                });
+            }
+        });
+
+        if (execution?.status === 'completed') {
+            logs.push({ timestamp: new Date().toISOString(), level: 'success', message: 'Workflow completed successfully' });
+        } else if (execution?.status === 'failed') {
+            logs.push({ timestamp: new Date().toISOString(), level: 'error', message: 'Workflow execution failed' });
+        } else if (execution?.status === 'paused') {
+            logs.push({ timestamp: new Date().toISOString(), level: 'warning', message: 'Workflow paused' });
+        }
+
+        setExecutionLogs(logs);
+    };
+
+    const handleRetryStep = async (stepIndex) => {
+        try {
+            toast.info(`Retrying step ${stepIndex + 1}...`);
+            if (onRetry) {
+                await onRetry(stepIndex, retryParams[stepIndex]);
+            }
+            setShowRetryDialog(null);
+            setRetryParams({});
+        } catch (error) {
+            toast.error('Failed to retry step');
+        }
+    };
+
+    const handleRetryWorkflow = async () => {
+        try {
+            toast.info('Retrying entire workflow...');
+            if (onRetry) {
+                await onRetry('all', { initial_input: execution?.initial_input });
+            }
+        } catch (error) {
+            toast.error('Failed to retry workflow');
+        }
+    };
+
+    const handlePauseResume = async () => {
+        try {
+            if (execution?.status === 'running') {
+                if (onPause) await onPause();
+                toast.success('Workflow paused');
+            } else if (execution?.status === 'paused') {
+                if (onResume) await onResume();
+                toast.success('Workflow resumed');
+            }
+        } catch (error) {
+            toast.error('Failed to pause/resume workflow');
+        }
+    };
+
+    const toggleLogs = (stepIndex) => {
+        setShowLogs(prev => ({ ...prev, [stepIndex]: !prev[stepIndex] }));
+    };
+
     const steps = workflow?.steps || [];
 
     return (
@@ -82,25 +179,92 @@ export default function WorkflowExecutionView({ execution, workflow }) {
             <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
                 <CardHeader>
                     <div className="flex items-center justify-between">
-                        <div>
+                        <div className="flex-1">
                             <CardTitle className="flex items-center gap-2">
                                 <Sparkles className="h-5 w-5 text-blue-600" />
                                 {workflow?.name || 'Workflow Execution'}
                             </CardTitle>
                             <p className="text-sm text-slate-600 mt-1">{workflow?.description}</p>
+                            <div className="flex items-center gap-2 mt-3">
+                                <Badge
+                                    className={cn(
+                                        execution?.status === 'completed' && 'bg-green-500',
+                                        execution?.status === 'running' && 'bg-blue-500 animate-pulse',
+                                        execution?.status === 'failed' && 'bg-red-500',
+                                        execution?.status === 'paused' && 'bg-yellow-500',
+                                        'text-white'
+                                    )}
+                                >
+                                    {execution?.status || 'initializing'}
+                                </Badge>
+                                <span className="text-xs text-slate-500">
+                                    Step {(execution?.current_step || 0) + 1} of {steps.length}
+                                </span>
+                            </div>
                         </div>
-                        <Badge
-                            className={cn(
-                                execution?.status === 'completed' && 'bg-green-500',
-                                execution?.status === 'running' && 'bg-blue-500',
-                                execution?.status === 'failed' && 'bg-red-500',
-                                'text-white'
+                        <div className="flex items-center gap-2">
+                            {execution?.status === 'running' && (
+                                <Button variant="outline" size="sm" onClick={handlePauseResume}>
+                                    <Pause className="h-4 w-4 mr-1" />
+                                    Pause
+                                </Button>
                             )}
-                        >
-                            {execution?.status || 'initializing'}
-                        </Badge>
+                            {execution?.status === 'paused' && (
+                                <Button variant="outline" size="sm" onClick={handlePauseResume}>
+                                    <Play className="h-4 w-4 mr-1" />
+                                    Resume
+                                </Button>
+                            )}
+                            {(execution?.status === 'failed' || execution?.status === 'completed') && (
+                                <Button variant="outline" size="sm" onClick={handleRetryWorkflow}>
+                                    <RotateCcw className="h-4 w-4 mr-1" />
+                                    Retry All
+                                </Button>
+                            )}
+                            {onRefresh && (
+                                <Button variant="ghost" size="sm" onClick={onRefresh}>
+                                    <RefreshCw className="h-4 w-4" />
+                                </Button>
+                            )}
+                        </div>
                     </div>
                 </CardHeader>
+            </Card>
+
+            {/* Execution Logs */}
+            <Card>
+                <CardHeader className="cursor-pointer" onClick={() => setShowLogs(prev => ({ ...prev, 'main': !prev['main'] }))}>
+                    <CardTitle className="flex items-center justify-between text-sm">
+                        <span className="flex items-center gap-2">
+                            <FileText className="h-4 w-4" />
+                            Execution Logs ({executionLogs.length})
+                        </span>
+                        <Button variant="ghost" size="sm">
+                            {showLogs['main'] ? 'Hide' : 'Show'}
+                        </Button>
+                    </CardTitle>
+                </CardHeader>
+                {showLogs['main'] && (
+                    <CardContent>
+                        <ScrollArea className="h-64 rounded-lg border border-slate-200 bg-slate-900 p-4">
+                            <div className="space-y-1 font-mono text-xs">
+                                {executionLogs.map((log, idx) => (
+                                    <div key={idx} className={cn(
+                                        "flex gap-3",
+                                        log.level === 'error' && 'text-red-400',
+                                        log.level === 'success' && 'text-green-400',
+                                        log.level === 'warning' && 'text-yellow-400',
+                                        log.level === 'info' && 'text-blue-400'
+                                    )}>
+                                        <span className="text-slate-500">{new Date(log.timestamp).toLocaleTimeString()}</span>
+                                        <span className="uppercase font-semibold">[{log.level}]</span>
+                                        <span className="text-slate-300">{log.message}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </ScrollArea>
+                    </CardContent>
+                )}
             </Card>
 
             {/* Initial Input */}
@@ -177,7 +341,106 @@ export default function WorkflowExecutionView({ execution, workflow }) {
                                         </div>
                                     </CardContent>
                                 )}
+
+                                {/* Show error and retry options if step failed */}
+                                {status === 'failed' && (
+                                    <CardContent>
+                                        <div className="bg-red-50 rounded-lg p-4 border border-red-200 space-y-3">
+                                            <div className="flex items-start gap-2">
+                                                <XCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                                                <div className="flex-1">
+                                                    <p className="text-sm font-semibold text-red-700">Step Failed</p>
+                                                    <p className="text-sm text-red-600 mt-1">
+                                                        {stepResult?.error || 'An error occurred during execution'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2 pt-2">
+                                                <Button 
+                                                    size="sm" 
+                                                    variant="outline"
+                                                    className="border-red-300 text-red-700 hover:bg-red-50"
+                                                    onClick={() => setShowRetryDialog(index)}
+                                                >
+                                                    <RotateCcw className="h-3 w-3 mr-1" />
+                                                    Retry Step
+                                                </Button>
+                                                <Button 
+                                                    size="sm" 
+                                                    variant="ghost"
+                                                    onClick={() => toggleLogs(index)}
+                                                >
+                                                    <FileText className="h-3 w-3 mr-1" />
+                                                    View Logs
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                )}
+
+                                {/* Step-specific logs */}
+                                {showLogs[index] && (
+                                    <CardContent>
+                                        <div className="bg-slate-900 rounded-lg p-3 border border-slate-700">
+                                            <p className="text-xs font-semibold text-slate-300 uppercase mb-2">Step Logs</p>
+                                            <div className="space-y-1 font-mono text-xs text-slate-400">
+                                                <div>[{stepResult?.started_at}] Step started</div>
+                                                <div>[{stepResult?.started_at}] Agent: {step.agent_name}</div>
+                                                <div>[{stepResult?.started_at}] Conversation ID: {stepResult?.conversation_id}</div>
+                                                {status === 'completed' && (
+                                                    <div className="text-green-400">[{stepResult?.completed_at}] Step completed successfully</div>
+                                                )}
+                                                {status === 'failed' && (
+                                                    <div className="text-red-400">[{stepResult?.completed_at}] Step failed: {stepResult?.error}</div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                )}
                             </Card>
+
+                            {/* Retry Dialog */}
+                            {showRetryDialog === index && (
+                                <Card className="border-2 border-orange-200 bg-orange-50 mt-4">
+                                    <CardHeader>
+                                        <CardTitle className="text-sm">Retry Step with Updated Parameters</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-3">
+                                        <div>
+                                            <label className="text-xs font-semibold text-slate-700 mb-1 block">
+                                                Modified Instructions (optional)
+                                            </label>
+                                            <Textarea
+                                                placeholder="Enter new instructions or leave empty to use original..."
+                                                value={retryParams[index]?.instructions || ''}
+                                                onChange={(e) => setRetryParams(prev => ({
+                                                    ...prev,
+                                                    [index]: { ...prev[index], instructions: e.target.value }
+                                                }))}
+                                                rows={3}
+                                                className="text-sm"
+                                            />
+                                        </div>
+                                        <div className="flex justify-end gap-2">
+                                            <Button 
+                                                size="sm" 
+                                                variant="outline"
+                                                onClick={() => setShowRetryDialog(null)}
+                                            >
+                                                Cancel
+                                            </Button>
+                                            <Button 
+                                                size="sm"
+                                                className="bg-orange-600 hover:bg-orange-700"
+                                                onClick={() => handleRetryStep(index)}
+                                            >
+                                                <RotateCcw className="h-3 w-3 mr-1" />
+                                                Retry Now
+                                            </Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
 
                             {/* Arrow between steps */}
                             {index < steps.length - 1 && (
