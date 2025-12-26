@@ -1,16 +1,16 @@
 import Agents from './pages/Agents';
 import Dashboard from './pages/Dashboard';
-import Workflows from './pages/Workflows';
-import Landing from './pages/Landing';
 import Integrations from './pages/Integrations';
+import Landing from './pages/Landing';
+import Workflows from './pages/Workflows';
 
 
 export const PAGES = {
     "Agents": Agents,
     "Dashboard": Dashboard,
-    "Workflows": Workflows,
-    "Landing": Landing,
     "Integrations": Integrations,
+    "Landing": Landing,
+    "Workflows": Workflows,
 }
 
 export const pagesConfig = {

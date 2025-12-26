@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LayoutDashboard, User, Settings } from 'lucide-react';
 import DashboardCustomizer from '../components/dashboards/DashboardCustomizer';
+import NaturalLanguageQuery from '../components/dashboards/NaturalLanguageQuery';
 import ExecutiveDashboard from '../components/dashboards/ExecutiveDashboard';
 import MarketingDashboard from '../components/dashboards/MarketingDashboard';
 import SalesDashboard from '../components/dashboards/SalesDashboard';
@@ -131,7 +132,11 @@ export default function DashboardPage() {
             </div>
 
             {/* Dashboard Content */}
-            <div className="p-6">
+            <div className="p-6 space-y-6">
+                {/* Natural Language Query */}
+                <NaturalLanguageQuery user={user} />
+
+                {/* Persona Dashboard */}
                 {DashboardComponent ? (
                     <DashboardComponent user={user} />
                 ) : (
