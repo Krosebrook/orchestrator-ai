@@ -6,6 +6,7 @@ import { Menu, Sparkles, Workflow as WorkflowIcon } from 'lucide-react';
 import AgentCard from '../components/agents/AgentCard';
 import ConversationList from '../components/agents/ConversationList';
 import ChatWindow from '../components/agents/ChatWindow';
+import AgentVersionManager from '../components/agents/AgentVersionManager';
 
 export default function AgentsPage() {
     const [agents, setAgents] = useState([]);
@@ -159,6 +160,10 @@ export default function AgentsPage() {
                                     agent={agent}
                                     onSelect={setSelectedAgent}
                                     isSelected={selectedAgent?.name === agent.name}
+                                    onManageVersions={(agent) => {
+                                        setSelectedAgentForVersions(agent);
+                                        setVersionManagerOpen(true);
+                                    }}
                                 />
                             ))}
                         </div>
@@ -207,6 +212,19 @@ export default function AgentsPage() {
                         agent={selectedAgent}
                     />
                 </div>
+            )}
+
+            {/* Version Manager Dialog */}
+            {selectedAgentForVersions && (
+                <AgentVersionManager
+                    open={versionManagerOpen}
+                    onClose={() => {
+                        setVersionManagerOpen(false);
+                        setSelectedAgentForVersions(null);
+                    }}
+                    agentName={selectedAgentForVersions.name}
+                    currentConfig={selectedAgentForVersions}
+                />
             )}
         </div>
     );
