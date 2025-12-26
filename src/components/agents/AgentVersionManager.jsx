@@ -1,0 +1,277 @@
+import { useState, useEffect } from 'react';
+import { base44 } from "@/api/base44Client";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { CheckCircle2, Clock, GitBranch, Plus, Tag } from 'lucide-react';
+import { cn } from "@/lib/utils";
+import { toast } from 'sonner';
+import moment from 'moment';
+
+export default function AgentVersionManager({ open, onClose, agentName, currentConfig }) {
+    const [versions, setVersions] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [showCreateVersion, setShowCreateVersion] = useState(false);
+    const [newVersion, setNewVersion] = useState({
+        version: '',
+        description: '',
+        changelog: []
+    });
+
+    useEffect(() => {
+        if (open && agentName) {
+            loadVersions();
+        }
+    }, [open, agentName]);
+
+    const loadVersions = async () => {
+        try {
+            const data = await base44.entities.AgentVersion.filter({ 
+                agent_name: agentName 
+            });
+            setVersions(data.sort((a, b) => new Date(b.created_date) - new Date(a.created_date)));
+        } catch (error) {
+            console.error('Failed to load versions:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCreateVersion = async () => {
+        if (!newVersion.version || !newVersion.description) {
+            toast.error('Please fill in all fields');
+            return;
+        }
+
+        try {
+            const user = await base44.auth.me();
+
+            // Deactivate current active version
+            const activeVersion = versions.find(v => v.is_active);
+            if (activeVersion) {
+                await base44.entities.AgentVersion.update(activeVersion.id, {
+                    is_active: false
+                });
+            }
+
+            // Create new version
+            await base44.entities.AgentVersion.create({
+                agent_name: agentName,
+                version: newVersion.version,
+                description: newVersion.description,
+                agent_config: currentConfig,
+                is_active: true,
+                created_by: user.email,
+                changelog: newVersion.changelog.filter(c => c.trim())
+            });
+
+            toast.success('Version created successfully');
+            setShowCreateVersion(false);
+            setNewVersion({ version: '', description: '', changelog: [] });
+            await loadVersions();
+        } catch (error) {
+            console.error('Failed to create version:', error);
+            toast.error('Failed to create version');
+        }
+    };
+
+    const handleActivateVersion = async (version) => {
+        if (!confirm(`Activate version ${version.version}?`)) return;
+
+        try {
+            // Deactivate all versions
+            await Promise.all(
+                versions.filter(v => v.is_active).map(v =>
+                    base44.entities.AgentVersion.update(v.id, { is_active: false })
+                )
+            );
+
+            // Activate selected version
+            await base44.entities.AgentVersion.update(version.id, {
+                is_active: true
+            });
+
+            toast.success(`Version ${version.version} activated`);
+            await loadVersions();
+        } catch (error) {
+            console.error('Failed to activate version:', error);
+            toast.error('Failed to activate version');
+        }
+    };
+
+    const activeVersion = versions.find(v => v.is_active);
+
+    return (
+        <Dialog open={open} onOpenChange={onClose}>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                        <GitBranch className="h-5 w-5" />
+                        Version History: {agentName}
+                    </DialogTitle>
+                </DialogHeader>
+
+                <div className="flex-1 overflow-hidden space-y-4">
+                    {/* Current Active Version */}
+                    {activeVersion && (
+                        <Card className="border-2 border-green-200 bg-green-50">
+                            <CardContent className="pt-4">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <CheckCircle2 className="h-5 w-5 text-green-600" />
+                                        <div>
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-semibold text-slate-800">
+                                                    Version {activeVersion.version}
+                                                </span>
+                                                <Badge className="bg-green-600">Active</Badge>
+                                            </div>
+                                            <p className="text-sm text-slate-600 mt-1">
+                                                {activeVersion.description}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Create New Version */}
+                    {!showCreateVersion ? (
+                        <Button
+                            onClick={() => setShowCreateVersion(true)}
+                            className="w-full"
+                            variant="outline"
+                        >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Create New Version
+                        </Button>
+                    ) : (
+                        <Card className="border-2 border-blue-200">
+                            <CardContent className="pt-4 space-y-3">
+                                <div>
+                                    <Label>Version Number</Label>
+                                    <Input
+                                        value={newVersion.version}
+                                        onChange={(e) => setNewVersion({...newVersion, version: e.target.value})}
+                                        placeholder="e.g., 2.1.0"
+                                    />
+                                </div>
+                                <div>
+                                    <Label>Description</Label>
+                                    <Textarea
+                                        value={newVersion.description}
+                                        onChange={(e) => setNewVersion({...newVersion, description: e.target.value})}
+                                        placeholder="What changed in this version?"
+                                        rows={2}
+                                    />
+                                </div>
+                                <div>
+                                    <Label>Changelog (one per line)</Label>
+                                    <Textarea
+                                        value={newVersion.changelog.join('\n')}
+                                        onChange={(e) => setNewVersion({
+                                            ...newVersion, 
+                                            changelog: e.target.value.split('\n')
+                                        })}
+                                        placeholder="- Added new capabilities&#10;- Fixed bugs&#10;- Improved performance"
+                                        rows={3}
+                                    />
+                                </div>
+                                <div className="flex justify-end gap-2">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            setShowCreateVersion(false);
+                                            setNewVersion({ version: '', description: '', changelog: [] });
+                                        }}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button onClick={handleCreateVersion}>
+                                        Create Version
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Version List */}
+                    <ScrollArea className="h-96">
+                        <div className="space-y-3">
+                            {loading ? (
+                                <p className="text-center text-slate-500 py-4">Loading versions...</p>
+                            ) : versions.length === 0 ? (
+                                <div className="text-center py-8 text-slate-500">
+                                    <Tag className="h-12 w-12 mx-auto mb-2 text-slate-300" />
+                                    <p>No versions yet. Create the first version!</p>
+                                </div>
+                            ) : (
+                                versions.map((version) => (
+                                    <Card
+                                        key={version.id}
+                                        className={cn(
+                                            "transition-all",
+                                            version.is_active && "border-green-200 bg-green-50"
+                                        )}
+                                    >
+                                        <CardContent className="pt-4">
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <span className="font-semibold text-slate-800">
+                                                            Version {version.version}
+                                                        </span>
+                                                        {version.is_active && (
+                                                            <Badge className="bg-green-600">Active</Badge>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-sm text-slate-600 mb-2">
+                                                        {version.description}
+                                                    </p>
+                                                    {version.changelog && version.changelog.length > 0 && (
+                                                        <div className="mt-2 p-2 bg-slate-50 rounded border border-slate-200">
+                                                            <p className="text-xs font-semibold text-slate-600 mb-1">
+                                                                Changelog:
+                                                            </p>
+                                                            <ul className="text-xs text-slate-600 space-y-0.5">
+                                                                {version.changelog.map((change, idx) => (
+                                                                    <li key={idx}>• {change}</li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    )}
+                                                    <div className="flex items-center gap-4 mt-3 text-xs text-slate-500">
+                                                        <span>By {version.created_by || 'Unknown'}</span>
+                                                        <span className="flex items-center gap-1">
+                                                            <Clock className="h-3 w-3" />
+                                                            {moment(version.created_date).fromNow()}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                {!version.is_active && (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() => handleActivateVersion(version)}
+                                                    >
+                                                        Activate
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ))
+                            )}
+                        </div>
+                    </ScrollArea>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+}
