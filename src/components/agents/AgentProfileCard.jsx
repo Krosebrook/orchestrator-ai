@@ -6,6 +6,9 @@ import { TrendingUp, Target, Users, Zap, Star, AlertCircle, Activity } from 'luc
 import AgentErrorLogViewer from './AgentErrorLogViewer';
 import TaskPerformanceBreakdownView from './TaskPerformanceBreakdownView';
 import AgentSelfReportManager from './AgentSelfReportManager';
+import AISkillGapAnalysis from './AISkillGapAnalysis';
+import AILearningPathGenerator from './AILearningPathGenerator';
+import AIFeedbackSynthesizer from './AIFeedbackSynthesizer';
 
 export default function AgentProfileCard({ profile, agent }) {
     if (!profile) return null;
@@ -157,20 +160,18 @@ export default function AgentProfileCard({ profile, agent }) {
                 )}
 
                 {/* Detailed Views */}
-                <Tabs defaultValue="overview" className="mt-4">
-                    <TabsList className="w-full">
-                        <TabsTrigger value="overview" className="flex-1 text-xs">Overview</TabsTrigger>
-                        <TabsTrigger value="errors" className="flex-1 text-xs">Errors</TabsTrigger>
-                        <TabsTrigger value="tasks" className="flex-1 text-xs">Tasks</TabsTrigger>
-                        <TabsTrigger value="reports" className="flex-1 text-xs">Reports</TabsTrigger>
+                <Tabs defaultValue="ai-insights" className="mt-4">
+                    <TabsList className="w-full grid grid-cols-4 gap-1">
+                        <TabsTrigger value="ai-insights" className="text-xs">AI Insights</TabsTrigger>
+                        <TabsTrigger value="errors" className="text-xs">Errors</TabsTrigger>
+                        <TabsTrigger value="tasks" className="text-xs">Tasks</TabsTrigger>
+                        <TabsTrigger value="reports" className="text-xs">Reports</TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="overview">
-                        <div className="text-xs text-slate-600 space-y-1">
-                            <p>✅ Total Tasks: {stats.total_tasks || 0}</p>
-                            <p>📊 Avg Quality: {stats.avg_quality_score?.toFixed(1) || 'N/A'}/10</p>
-                            <p>💰 Total Cost: ${stats.total_cost?.toFixed(2) || '0.00'}</p>
-                        </div>
+                    <TabsContent value="ai-insights" className="space-y-4">
+                        <AISkillGapAnalysis agentName={agent?.name || profile.agent_name} profile={profile} />
+                        <AILearningPathGenerator agentName={agent?.name || profile.agent_name} profile={profile} />
+                        <AIFeedbackSynthesizer agentName={agent?.name || profile.agent_name} />
                     </TabsContent>
 
                     <TabsContent value="errors" className="p-0">
