@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { LayoutDashboard, Bot, Workflow, Home, Plug, Rocket, BookOpen, Shield, BarChart3, GitMerge, Users } from 'lucide-react';
+import { LayoutDashboard, Bot, Workflow, Home, Plug, Rocket, BookOpen, Shield, BarChart3, GitMerge, Users, Sparkles } from 'lucide-react';
 import { PermissionsProvider, usePermissions } from './components/rbac/PermissionCheck';
 
 function LayoutContent({ children, currentPageName }) {

@@ -11,6 +11,9 @@ import VisualWorkflowBuilder from '../components/workflows/VisualWorkflowBuilder
 import WorkflowExecutionView from '../components/workflows/WorkflowExecutionView';
 import WorkflowTemplates from '../components/workflows/WorkflowTemplates';
 import TemplateConfigDialog from '../components/workflows/TemplateConfigDialog';
+import AIWorkflowGenerator from '../components/workflows/AIWorkflowGenerator';
+import WorkflowOptimizationAssistant from '../components/workflows/WorkflowOptimizationAssistant';
+import PerformanceAnalysisEngine from '../components/workflows/PerformanceAnalysisEngine';
 import { toast } from 'sonner';
 
 export default function WorkflowsPage() {
@@ -246,8 +249,12 @@ export default function WorkflowsPage() {
                 </div>
 
                 {/* Tabs */}
-                <Tabs defaultValue="templates" className="space-y-6">
+                <Tabs defaultValue="ai-generator" className="space-y-6">
                     <TabsList className="bg-white">
+                        <TabsTrigger value="ai-generator">
+                            <Sparkles className="h-4 w-4 mr-2" />
+                            AI Generator
+                        </TabsTrigger>
                         <TabsTrigger value="templates">
                             <Sparkles className="h-4 w-4 mr-2" />
                             Templates
@@ -261,6 +268,17 @@ export default function WorkflowsPage() {
                             Executions
                         </TabsTrigger>
                     </TabsList>
+
+                    {/* AI Generator Tab */}
+                    <TabsContent value="ai-generator" className="space-y-6">
+                        <AIWorkflowGenerator
+                            agents={agents}
+                            onWorkflowGenerated={async (workflow) => {
+                                await handleSaveWorkflow(workflow);
+                                toast.success('AI-generated workflow saved!');
+                            }}
+                        />
+                    </TabsContent>
 
                     {/* Templates Tab */}
                     <TabsContent value="templates">
@@ -282,6 +300,26 @@ export default function WorkflowsPage() {
                                 className="pl-10 bg-white"
                             />
                         </div>
+
+                        {/* AI Optimization & Performance */}
+                        {filteredWorkflows.length > 0 && (
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <WorkflowOptimizationAssistant
+                                    workflow={filteredWorkflows[0]}
+                                    executions={executions.filter(e => e.workflow_id === filteredWorkflows[0].id)}
+                                    onApplyOptimization={(suggestion) => {
+                                        toast.info(`Optimization: ${suggestion.title}`);
+                                    }}
+                                />
+                                <PerformanceAnalysisEngine
+                                    workflow={filteredWorkflows[0]}
+                                    executions={executions.filter(e => e.workflow_id === filteredWorkflows[0].id)}
+                                    onProposedImprovement={(improvement) => {
+                                        toast.success(`Improvement proposed: ${improvement.title}`);
+                                    }}
+                                />
+                            </div>
+                        )}
 
                         {/* Workflow Grid */}
                         {filteredWorkflows.length === 0 ? (

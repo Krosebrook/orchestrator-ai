@@ -27,9 +27,14 @@ export default function LandingPage() {
 
     const features = [
         {
-            icon: Workflow,
-            title: "Multi-Agent Workflows",
-            description: "Chain multiple AI agents together for complex task automation with seamless handoffs and parallel processing."
+            icon: Sparkles,
+            title: "AI Workflow Generation",
+            description: "Describe your goal in natural language and let AI design the optimal workflow structure automatically."
+        },
+        {
+            icon: TrendingUp,
+            title: "Intelligent Optimization",
+            description: "AI analyzes performance and suggests bottleneck fixes, agent swaps, and parameter tuning in real-time."
         },
         {
             icon: Brain,
@@ -38,13 +43,8 @@ export default function LandingPage() {
         },
         {
             icon: Users,
-            title: "Persona-Based Dashboards",
-            description: "Role-specific views for executives, managers, developers, analysts, and all team members."
-        },
-        {
-            icon: Zap,
-            title: "Instant Workflow Templates",
-            description: "Start fast with 10+ ready-to-use workflow templates for common business processes."
+            title: "Multi-Agent Collaboration",
+            description: "Real-time agent collaboration hub with shared context, proposals, and coordinated task execution."
         },
         {
             icon: Shield,
@@ -53,8 +53,8 @@ export default function LandingPage() {
         },
         {
             icon: BarChart3,
-            title: "Real-Time Analytics",
-            description: "Monitor workflow performance, track KPIs, and get actionable insights across your organization."
+            title: "Performance Analytics",
+            description: "AI-driven performance analysis with automatic improvement suggestions based on execution history."
         }
     ];
 
@@ -116,8 +116,8 @@ export default function LandingPage() {
                         </h1>
                         
                         <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-                            Chain specialized AI agents into powerful workflows. Automate research, content creation, 
-                            data analysis, and business processes with enterprise-grade reliability.
+                            Let AI design, optimize, and improve your workflows automatically. Describe your goal in natural language 
+                            and watch as intelligent agents collaborate to execute complex multi-step processes.
                         </p>
                         
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -264,9 +264,9 @@ export default function LandingPage() {
                         },
                         {
                             step: "2",
-                            title: "Build Workflows",
-                            description: "Chain agents together with simple drag-and-drop or use ready-made templates",
-                            icon: Workflow
+                            title: "AI-Generated Workflows",
+                            description: "Describe your goal and let AI design optimal workflows, or use pre-built templates",
+                            icon: Sparkles
                         },
                         {
                             step: "3",
