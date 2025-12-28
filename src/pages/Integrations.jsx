@@ -17,19 +17,27 @@ import {
     Webhook,
     Key,
     Zap,
-    Trash2
+    Trash2,
+    RefreshCw,
+    Sparkles
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from "@/lib/utils";
 import ConnectionDialog from '../components/integrations/ConnectionDialog';
+import ServiceCatalog from '../components/integrations/ServiceCatalog';
+import SyncConfigurationDialog from '../components/integrations/SyncConfigurationDialog';
+import SyncMonitor from '../components/integrations/SyncMonitor';
 
 export default function IntegrationsPage() {
     const [searchQuery, setSearchQuery] = useState('');
-    const [activeTab, setActiveTab] = useState('available');
+    const [activeTab, setActiveTab] = useState('connections');
     const [connections, setConnections] = useState([]);
+    const [syncConfigs, setSyncConfigs] = useState([]);
+    const [entities, setEntities] = useState(['Lead', 'Ticket', 'Task', 'Campaign', 'ContentPiece']);
     const [user, setUser] = useState(null);
     const [selectedIntegration, setSelectedIntegration] = useState(null);
     const [showConnectionDialog, setShowConnectionDialog] = useState(false);
+    const [showSyncDialog, setShowSyncDialog] = useState(false);
 
     useEffect(() => {
         loadUserAndConnections();
@@ -40,12 +48,17 @@ export default function IntegrationsPage() {
             const currentUser = await base44.auth.me();
             setUser(currentUser);
 
-            const userConnections = await base44.entities.IntegrationConnection.filter({
-                user_email: currentUser.email
-            });
+            const [userConnections, syncs] = await Promise.all([
+                base44.entities.IntegrationConnection.filter({
+                    user_email: currentUser.email
+                }),
+                base44.entities.SyncConfiguration.list('-updated_date')
+            ]);
+            
             setConnections(userConnections || []);
+            setSyncConfigs(syncs || []);
         } catch (error) {
-            console.error('Failed to load connections:', error);
+            console.error('Failed to load data:', error);
         }
     };
 
@@ -209,6 +222,53 @@ export default function IntegrationsPage() {
         }
     };
 
+    const handleConfigureSync = (integration) => {
+        setSelectedIntegration(integration);
+        setShowSyncDialog(true);
+    };
+
+    const handleSaveSync = async (syncConfig) => {
+        try {
+            await base44.entities.SyncConfiguration.create(syncConfig);
+            toast.success('Sync configuration created');
+            await loadUserAndConnections();
+            setShowSyncDialog(false);
+        } catch (error) {
+            console.error('Failed to create sync:', error);
+            toast.error('Failed to create sync configuration');
+        }
+    };
+
+    const handleToggleSync = async (sync) => {
+        const newStatus = sync.status === 'active' ? 'paused' : 'active';
+        try {
+            await base44.entities.SyncConfiguration.update(sync.id, { status: newStatus });
+            toast.success(`Sync ${newStatus === 'active' ? 'resumed' : 'paused'}`);
+            await loadUserAndConnections();
+        } catch (error) {
+            console.error('Failed to toggle sync:', error);
+            toast.error('Failed to update sync');
+        }
+    };
+
+    const handleSyncNow = async (sync) => {
+        toast.info('Manual sync triggered - this would sync data now');
+        // In production, this would trigger actual sync logic
+    };
+
+    const handleDeleteSync = async (sync) => {
+        if (!confirm(`Delete sync configuration "${sync.name}"?`)) return;
+        
+        try {
+            await base44.entities.SyncConfiguration.delete(sync.id);
+            toast.success('Sync configuration deleted');
+            await loadUserAndConnections();
+        } catch (error) {
+            console.error('Failed to delete sync:', error);
+            toast.error('Failed to delete sync');
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
             <div className="max-w-7xl mx-auto space-y-6">
@@ -313,98 +373,124 @@ export default function IntegrationsPage() {
                 {/* Tabs */}
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
                     <TabsList className="bg-white">
-                        <TabsTrigger value="all">All</TabsTrigger>
-                        <TabsTrigger value="available">Available</TabsTrigger>
-                        <TabsTrigger value="coming_soon">Coming Soon</TabsTrigger>
+                        <TabsTrigger value="connections">
+                            <Plug className="h-4 w-4 mr-2" />
+                            My Connections
+                        </TabsTrigger>
+                        <TabsTrigger value="catalog">
+                            <Sparkles className="h-4 w-4 mr-2" />
+                            Service Catalog
+                        </TabsTrigger>
+                        <TabsTrigger value="sync">
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                            Data Sync
+                        </TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value={activeTab} className="mt-6">
-                        {filteredIntegrations.length === 0 ? (
-                            <Card>
-                                <CardContent className="pt-12 pb-12 text-center">
-                                    <Plug className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-                                    <p className="text-slate-500">No integrations found matching your criteria</p>
-                                </CardContent>
-                            </Card>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {filteredIntegrations.map((integration) => (
-                                    <Card key={integration.id} className="border-2 hover:shadow-lg transition-all">
-                                        <CardHeader>
-                                            <div className="flex items-start justify-between">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="text-4xl">{integration.icon}</div>
-                                                    <div>
-                                                        <CardTitle className="text-lg">{integration.name}</CardTitle>
-                                                        <Badge 
-                                                            variant="outline" 
-                                                            className={cn(
-                                                                "mt-1",
-                                                                integration.status === 'available' && "border-green-500 text-green-700",
-                                                                integration.status === 'coming_soon' && "border-orange-500 text-orange-700"
-                                                            )}
-                                                        >
-                                                            {integration.status === 'available' ? 'Available' : 'Coming Soon'}
-                                                        </Badge>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <CardDescription className="mt-2">
-                                                {integration.description}
-                                            </CardDescription>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <div className="space-y-3">
-                                                <div className="flex items-center justify-between text-sm">
-                                                    <span className="text-slate-600">Type:</span>
-                                                    <Badge variant="outline">
-                                                        {integration.type === 'oauth' ? 'OAuth' : 'API Key'}
-                                                    </Badge>
-                                                </div>
-                                                <div className="flex items-center justify-between text-sm">
-                                                    <span className="text-slate-600">Category:</span>
-                                                    <Badge variant="outline" className="capitalize">
-                                                        {integration.category}
-                                                    </Badge>
-                                                </div>
-                                                {isConnected(integration.id) ? (
-                                                    <div className="space-y-2 mt-4">
-                                                        <div className="flex items-center gap-2 p-2 bg-green-50 rounded-lg border border-green-200">
-                                                            <CheckCircle className="h-4 w-4 text-green-600" />
-                                                            <span className="text-sm text-green-700 font-medium">Connected</span>
+                    {/* My Connections Tab */}
+                    <TabsContent value="connections" className="mt-6">
+                        <div className="space-y-6">
+                            <div className="flex justify-between items-center">
+                                <p className="text-slate-600">Manage your connected services</p>
+                                <Button onClick={() => setActiveTab('catalog')}>
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Add Connection
+                                </Button>
+                            </div>
+
+                            {connections.filter(c => c.status === 'active').length === 0 ? (
+                                <Card>
+                                    <CardContent className="pt-12 pb-12 text-center">
+                                        <Plug className="h-16 w-16 text-slate-300 mx-auto mb-4" />
+                                        <p className="text-slate-500 mb-4">No connections yet</p>
+                                        <Button onClick={() => setActiveTab('catalog')}>
+                                            Browse Service Catalog
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {connections.filter(c => c.status === 'active').map((connection) => {
+                                        const integration = integrations.find(i => i.id === connection.integration_id);
+                                        return (
+                                            <Card key={connection.id}>
+                                                <CardHeader>
+                                                    <div className="flex items-start justify-between">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="text-3xl">{integration?.icon || '🔌'}</div>
+                                                            <div>
+                                                                <CardTitle className="text-base">
+                                                                    {connection.integration_name}
+                                                                </CardTitle>
+                                                                <Badge className="mt-1 bg-green-100 text-green-700">
+                                                                    Connected
+                                                                </Badge>
+                                                            </div>
                                                         </div>
+                                                    </div>
+                                                </CardHeader>
+                                                <CardContent>
+                                                    <div className="flex gap-2">
                                                         <Button
                                                             variant="outline"
-                                                            className="w-full text-red-600 hover:bg-red-50"
-                                                            onClick={() => handleDisconnect(integration)}
+                                                            size="sm"
+                                                            onClick={() => handleConfigureSync(connection)}
+                                                            className="flex-1"
                                                         >
-                                                            <Trash2 className="h-4 w-4 mr-2" />
-                                                            Disconnect
+                                                            <RefreshCw className="h-3 w-3 mr-1" />
+                                                            Configure Sync
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => handleDisconnect(integration)}
+                                                            className="text-red-600"
+                                                        >
+                                                            <Trash2 className="h-3 w-3" />
                                                         </Button>
                                                     </div>
-                                                ) : (
-                                                    <Button
-                                                        className="w-full mt-4"
-                                                        variant={integration.status === 'available' ? 'default' : 'outline'}
-                                                        onClick={() => handleConnect(integration)}
-                                                        disabled={integration.status === 'coming_soon'}
-                                                    >
-                                                        {integration.status === 'available' ? (
-                                                            <>
-                                                                <Plus className="h-4 w-4 mr-2" />
-                                                                Connect
-                                                            </>
-                                                        ) : (
-                                                            'Coming Soon'
-                                                        )}
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                ))}
+                                                </CardContent>
+                                            </Card>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    </TabsContent>
+
+                    {/* Service Catalog Tab */}
+                    <TabsContent value="catalog" className="mt-6">
+                        <ServiceCatalog
+                            onConnect={handleConnect}
+                            connectedServices={connections.filter(c => c.status === 'active').map(c => c.integration_id)}
+                        />
+                    </TabsContent>
+
+                    {/* Data Sync Tab */}
+                    <TabsContent value="sync" className="mt-6">
+                        <div className="space-y-6">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h2 className="text-xl font-semibold text-slate-800">Data Synchronization</h2>
+                                    <p className="text-slate-600">Configure automatic data sync between services</p>
+                                </div>
+                                <Button 
+                                    onClick={() => setShowSyncDialog(true)}
+                                    disabled={connections.filter(c => c.status === 'active').length === 0}
+                                >
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    New Sync
+                                </Button>
                             </div>
-                        )}
+
+                            <SyncMonitor
+                                syncs={syncConfigs}
+                                onEdit={handleConfigureSync}
+                                onDelete={handleDeleteSync}
+                                onToggle={handleToggleSync}
+                                onSync={handleSyncNow}
+                            />
+                        </div>
                     </TabsContent>
                 </Tabs>
 
@@ -439,6 +525,15 @@ export default function IntegrationsPage() {
                     }}
                     integration={selectedIntegration}
                     onConnected={loadUserAndConnections}
+                />
+
+                {/* Sync Configuration Dialog */}
+                <SyncConfigurationDialog
+                    open={showSyncDialog}
+                    onClose={() => setShowSyncDialog(false)}
+                    integration={selectedIntegration}
+                    entities={entities}
+                    onSave={handleSaveSync}
                 />
             </div>
         </div>
