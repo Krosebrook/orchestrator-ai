@@ -11,6 +11,8 @@ import {
     Save, Settings, ArrowRight, Zap, X
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import ActionConfigDialog from './ActionConfigDialog';
+import ConditionalLogicEditor from './ConditionalLogicEditor';
 
 const NODE_TYPES = [
     { id: 'agent', name: 'Agent Task', icon: Bot, color: 'from-blue-500 to-cyan-500' },
@@ -209,6 +211,19 @@ export default function VisualWorkflowBuilder({ workflow, agents, onSave, onCanc
                             />
                         </div>
                         <div>
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setSelectedNode(node);
+                                    setShowActionDialog(true);
+                                }}
+                                className="w-full"
+                            >
+                                <Zap className="h-4 w-4 mr-2" />
+                                Configure Actions ({node.config.actions?.length || 0})
+                            </Button>
+                        </div>
+                        <div>
                             <Label>Max Retries</Label>
                             <Input
                                 type="number"
@@ -224,36 +239,28 @@ export default function VisualWorkflowBuilder({ workflow, agents, onSave, onCanc
                 {node.type === 'condition' && (
                     <>
                         <div>
-                            <Label>Condition Prompt</Label>
-                            <Textarea
-                                value={node.config.condition_prompt || ''}
-                                onChange={(e) => updateNode(node.id, {
-                                    config: { ...node.config, condition_prompt: e.target.value }
-                                })}
-                                placeholder="Describe the condition to evaluate..."
-                                rows={3}
-                            />
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setSelectedNode(node);
+                                    setShowConditionDialog(true);
+                                }}
+                                className="w-full"
+                            >
+                                <GitBranch className="h-4 w-4 mr-2" />
+                                Configure Conditions ({node.config.conditions?.length || 0})
+                            </Button>
                         </div>
-                        <div className="grid grid-cols-2 gap-2">
-                            <div>
-                                <Label>True Branch Label</Label>
-                                <Input
-                                    value={node.config.true_label || 'Yes'}
-                                    onChange={(e) => updateNode(node.id, {
-                                        config: { ...node.config, true_label: e.target.value }
-                                    })}
-                                />
+                        {node.config.conditions?.length > 0 && (
+                            <div className="text-xs bg-blue-50 p-3 rounded">
+                                <p className="font-semibold text-blue-700 mb-1">Active Conditions:</p>
+                                {node.config.conditions.map((cond, idx) => (
+                                    <p key={idx} className="text-blue-600">
+                                        {cond.field} {cond.operator} {cond.value}
+                                    </p>
+                                ))}
                             </div>
-                            <div>
-                                <Label>False Branch Label</Label>
-                                <Input
-                                    value={node.config.false_label || 'No'}
-                                    onChange={(e) => updateNode(node.id, {
-                                        config: { ...node.config, false_label: e.target.value }
-                                    })}
-                                />
-                            </div>
-                        </div>
+                        )}
                     </>
                 )}
 
@@ -483,6 +490,29 @@ export default function VisualWorkflowBuilder({ workflow, agents, onSave, onCanc
                     Save Workflow
                 </Button>
             </div>
+
+            {/* Action Configuration Dialog */}
+            <ActionConfigDialog
+                open={showActionDialog}
+                onClose={() => setShowActionDialog(false)}
+                node={selectedNode}
+                onSave={(updatedNode) => {
+                    setNodes(nodes.map(n => n.id === updatedNode.id ? updatedNode : n));
+                    setShowActionDialog(false);
+                }}
+                entities={['Lead', 'Ticket', 'Task', 'Campaign', 'ContentPiece']}
+            />
+
+            {/* Conditional Logic Editor */}
+            <ConditionalLogicEditor
+                open={showConditionDialog}
+                onClose={() => setShowConditionDialog(false)}
+                node={selectedNode}
+                onSave={(updatedNode) => {
+                    setNodes(nodes.map(n => n.id === updatedNode.id ? updatedNode : n));
+                    setShowConditionDialog(false);
+                }}
+            />
         </div>
     );
 }
