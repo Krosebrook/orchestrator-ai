@@ -7,6 +7,7 @@ import Deployments from './pages/Deployments';
 import GettingStarted from './pages/GettingStarted';
 import RoleManagement from './pages/RoleManagement';
 import UserManagement from './pages/UserManagement';
+import AgentPerformance from './pages/AgentPerformance';
 import __Layout from './Layout.jsx';
 
 
@@ -20,6 +21,7 @@ export const PAGES = {
     "GettingStarted": GettingStarted,
     "RoleManagement": RoleManagement,
     "UserManagement": UserManagement,
+    "AgentPerformance": AgentPerformance,
 }
 
 export const pagesConfig = {

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { LayoutDashboard, Bot, Workflow, Home, Plug, Rocket, BookOpen, Shield } from 'lucide-react';
+import { LayoutDashboard, Bot, Workflow, Home, Plug, Rocket, BookOpen, Shield, BarChart3 } from 'lucide-react';
 import { PermissionsProvider, usePermissions } from './components/rbac/PermissionCheck';
 
 function LayoutContent({ children, currentPageName }) {
@@ -74,6 +74,10 @@ function LayoutContent({ children, currentPageName }) {
                             Deployments
                         </Link>
                         )}
+                        <Link to={createPageUrl('AgentPerformance')} className={navLinkClass('AgentPerformance')}>
+                            <BarChart3 className="h-4 w-4" />
+                            Performance
+                        </Link>
                         {canAccessResource('admin') && (
                         <>
                             <Link to={createPageUrl('RoleManagement')} className={navLinkClass('RoleManagement')}>
