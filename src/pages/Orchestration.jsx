@@ -3,11 +3,12 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { GitMerge, Plus, Activity, TrendingUp } from 'lucide-react';
+import { GitMerge, Plus, Activity, TrendingUp, Sparkles } from 'lucide-react';
 import OrchestrationBuilder from '../components/orchestration/OrchestrationBuilder';
 import OrchestrationMonitor from '../components/orchestration/OrchestrationMonitor';
 import AgentCollaborationView from '../components/orchestration/AgentCollaborationView';
 import VisualWorkflowCanvas from '../components/orchestration/VisualWorkflowCanvas';
+import OptimizationRecommendations from '../components/orchestration/OptimizationRecommendations';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from 'sonner';
 
@@ -145,6 +146,10 @@ export default function OrchestrationPage() {
                         <TabsTrigger value="visual">Visual Workflow</TabsTrigger>
                         <TabsTrigger value="monitor">Live Monitor</TabsTrigger>
                         <TabsTrigger value="collaboration">Collaboration View</TabsTrigger>
+                        <TabsTrigger value="optimization">
+                            <Sparkles className="h-4 w-4 mr-2" />
+                            AI Optimization
+                        </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="orchestrations">
@@ -234,6 +239,66 @@ export default function OrchestrationPage() {
                             handoffs={handoffs}
                             agents={agents}
                         />
+                    </TabsContent>
+
+                    <TabsContent value="optimization">
+                        <div className="space-y-6">
+                            <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-lg border border-purple-200">
+                                <div className="flex items-start gap-4">
+                                    <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
+                                        <Sparkles className="h-6 w-6 text-white" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-slate-800 mb-2">
+                                            AI-Powered Orchestration Optimization
+                                        </h3>
+                                        <p className="text-slate-600">
+                                            Get intelligent recommendations based on agent profiles, historical performance, 
+                                            and workflow analysis. Discover optimal agent pairings, identify bottlenecks, 
+                                            and unlock efficiency improvements.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {orchestrations.length === 0 ? (
+                                <Card>
+                                    <CardContent className="pt-12 pb-12 text-center">
+                                        <Sparkles className="h-16 w-16 text-slate-300 mx-auto mb-4" />
+                                        <p className="text-slate-500">
+                                            Create an orchestration to get AI-powered optimization recommendations
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            ) : (
+                                <div className="space-y-4">
+                                    {orchestrations.map((orch) => (
+                                        <Card key={orch.id}>
+                                            <CardHeader>
+                                                <CardTitle className="text-lg">{orch.name}</CardTitle>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <OptimizationRecommendations
+                                                    orchestration={orch}
+                                                    onApplyOptimization={async (sequence) => {
+                                                        const updatedAgents = sequence.map((agentName, idx) => ({
+                                                            agent_name: agentName,
+                                                            role: `Step ${idx + 1}`,
+                                                            sequence: idx
+                                                        }));
+                                                        await base44.entities.AgentOrchestration.update(orch.id, {
+                                                            agents: updatedAgents
+                                                        });
+                                                        toast.success('Orchestration updated with optimized sequence!');
+                                                        loadData();
+                                                    }}
+                                                />
+                                            </CardContent>
+                                        </Card>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </TabsContent>
                 </Tabs>
 
