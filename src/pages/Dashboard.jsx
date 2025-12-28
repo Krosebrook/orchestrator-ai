@@ -3,9 +3,10 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { LayoutDashboard, User, Settings } from 'lucide-react';
+import { LayoutDashboard, User, Settings, PlayCircle } from 'lucide-react';
 import DashboardCustomizer from '../components/dashboards/DashboardCustomizer';
 import NaturalLanguageQuery from '../components/dashboards/NaturalLanguageQuery';
+import OnboardingTutorial from '../components/onboarding/OnboardingTutorial';
 import ExecutiveDashboard from '../components/dashboards/ExecutiveDashboard';
 import MarketingDashboard from '../components/dashboards/MarketingDashboard';
 import SalesDashboard from '../components/dashboards/SalesDashboard';
@@ -37,10 +38,18 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [showCustomizer, setShowCustomizer] = useState(false);
     const [dashboardLayout, setDashboardLayout] = useState(null);
+    const [showOnboarding, setShowOnboarding] = useState(false);
 
     useEffect(() => {
         loadUserData();
     }, []);
+
+    useEffect(() => {
+        // Check if user needs onboarding
+        if (user && !user.onboarding_completed) {
+            setShowOnboarding(true);
+        }
+    }, [user]);
 
     const loadUserData = async () => {
         try {
@@ -109,6 +118,14 @@ export default function DashboardPage() {
                         <Button
                             variant="outline"
                             size="sm"
+                            onClick={() => setShowOnboarding(true)}
+                        >
+                            <PlayCircle className="h-4 w-4 mr-2" />
+                            Tutorial
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() => setShowCustomizer(true)}
                         >
                             <Settings className="h-4 w-4 mr-2" />
@@ -156,7 +173,12 @@ export default function DashboardPage() {
                     onSave={(layout) => setDashboardLayout(layout)}
                     currentLayout={dashboardLayout}
                 />
-            </div>
-        </div>
-    );
-}
+
+                <OnboardingTutorial 
+                    open={showOnboarding} 
+                    onClose={() => setShowOnboarding(false)} 
+                />
+                </div>
+                </div>
+                );
+                }

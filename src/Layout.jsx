@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { LayoutDashboard, Bot, Workflow, Home, Plug, Rocket } from 'lucide-react';
+import { LayoutDashboard, Bot, Workflow, Home, Plug, Rocket, BookOpen } from 'lucide-react';
 
 export default function Layout({ children, currentPageName }) {
     const navLinkClass = (pageName) => {
@@ -26,30 +26,34 @@ export default function Layout({ children, currentPageName }) {
                         </Link>
                         
                         <div className="flex items-center gap-2">
-                    <Link to={createPageUrl('Landing')} className={navLinkClass('Landing')}>
+                        <Link to={createPageUrl('Landing')} className={navLinkClass('Landing')}>
                         <Home className="h-4 w-4" />
                         Home
-                    </Link>
-                    <Link to={createPageUrl('Dashboard')} className={navLinkClass('Dashboard')}>
+                        </Link>
+                        <Link to={createPageUrl('GettingStarted')} className={navLinkClass('GettingStarted')}>
+                        <BookOpen className="h-4 w-4" />
+                        Getting Started
+                        </Link>
+                        <Link to={createPageUrl('Dashboard')} className={navLinkClass('Dashboard')}>
                         <LayoutDashboard className="h-4 w-4" />
                         Dashboard
-                    </Link>
-                    <Link to={createPageUrl('Agents')} className={navLinkClass('Agents')}>
+                        </Link>
+                        <Link to={createPageUrl('Agents')} className={navLinkClass('Agents')}>
                         <Bot className="h-4 w-4" />
                         Agents
-                    </Link>
-                    <Link to={createPageUrl('Workflows')} className={navLinkClass('Workflows')}>
+                        </Link>
+                        <Link to={createPageUrl('Workflows')} className={navLinkClass('Workflows')}>
                         <Workflow className="h-4 w-4" />
                         Workflows
-                    </Link>
-                    <Link to={createPageUrl('Integrations')} className={navLinkClass('Integrations')}>
+                        </Link>
+                        <Link to={createPageUrl('Integrations')} className={navLinkClass('Integrations')}>
                         <Plug className="h-4 w-4" />
                         Integrations
-                    </Link>
-                    <Link to={createPageUrl('Deployments')} className={navLinkClass('Deployments')}>
+                        </Link>
+                        <Link to={createPageUrl('Deployments')} className={navLinkClass('Deployments')}>
                         <Rocket className="h-4 w-4" />
                         Deployments
-                    </Link>
+                        </Link>
                         </div>
                     </div>
                 </div>
