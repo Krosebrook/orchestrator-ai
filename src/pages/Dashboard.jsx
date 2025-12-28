@@ -7,6 +7,7 @@ import { LayoutDashboard, User, Settings, PlayCircle } from 'lucide-react';
 import DashboardCustomizer from '../components/dashboards/DashboardCustomizer';
 import NaturalLanguageQuery from '../components/dashboards/NaturalLanguageQuery';
 import OnboardingTutorial from '../components/onboarding/OnboardingTutorial';
+import ProactiveAssistant from '../components/proactive/ProactiveAssistant';
 import ExecutiveDashboard from '../components/dashboards/ExecutiveDashboard';
 import MarketingDashboard from '../components/dashboards/MarketingDashboard';
 import SalesDashboard from '../components/dashboards/SalesDashboard';
@@ -152,6 +153,9 @@ export default function DashboardPage() {
             <div className="p-6 space-y-6">
                 {/* Natural Language Query */}
                 <NaturalLanguageQuery user={user} />
+
+                {/* Proactive Assistant */}
+                <ProactiveAssistant />
 
                 {/* Persona Dashboard */}
                 {DashboardComponent ? (
