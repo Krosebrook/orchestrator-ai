@@ -1,12 +1,18 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { TrendingUp, Target, Users, Zap, Star } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TrendingUp, Target, Users, Zap, Star, AlertCircle, Activity } from 'lucide-react';
+import AgentErrorLogViewer from './AgentErrorLogViewer';
+import TaskPerformanceBreakdownView from './TaskPerformanceBreakdownView';
+import AgentSelfReportManager from './AgentSelfReportManager';
 
 export default function AgentProfileCard({ profile, agent }) {
     if (!profile) return null;
 
     const stats = profile.performance_stats || {};
+    const errorSummary = profile.error_summary || {};
+    const feedbackSummary = profile.feedback_summary || {};
 
     return (
         <Card className="border-2">
@@ -109,6 +115,76 @@ export default function AgentProfileCard({ profile, agent }) {
                         {profile.optimal_workload}
                     </Badge>
                 </div>
+
+                {/* Error Summary */}
+                {errorSummary.total_errors > 0 && (
+                    <div>
+                        <p className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
+                            <AlertCircle className="h-4 w-4 text-red-600" />
+                            Error Summary
+                        </p>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div className="bg-slate-50 p-2 rounded">
+                                <p className="text-slate-500">Total</p>
+                                <p className="font-semibold">{errorSummary.total_errors}</p>
+                            </div>
+                            <div className="bg-slate-50 p-2 rounded">
+                                <p className="text-slate-500">Resolution Rate</p>
+                                <p className="font-semibold">{errorSummary.resolution_rate || 0}%</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Feedback Summary */}
+                {feedbackSummary.total_feedback > 0 && (
+                    <div>
+                        <p className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
+                            <Star className="h-4 w-4 text-yellow-600" />
+                            User Feedback
+                        </p>
+                        <div className="bg-slate-50 p-2 rounded">
+                            <div className="flex items-center justify-between mb-1">
+                                <span className="text-xs text-slate-500">Average Rating</span>
+                                <span className="text-sm font-semibold">{feedbackSummary.avg_rating?.toFixed(1)}/5</span>
+                            </div>
+                            <div className="flex gap-2 text-xs">
+                                <span className="text-green-600">👍 {feedbackSummary.positive_count}</span>
+                                <span className="text-red-600">👎 {feedbackSummary.negative_count}</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Detailed Views */}
+                <Tabs defaultValue="overview" className="mt-4">
+                    <TabsList className="w-full">
+                        <TabsTrigger value="overview" className="flex-1 text-xs">Overview</TabsTrigger>
+                        <TabsTrigger value="errors" className="flex-1 text-xs">Errors</TabsTrigger>
+                        <TabsTrigger value="tasks" className="flex-1 text-xs">Tasks</TabsTrigger>
+                        <TabsTrigger value="reports" className="flex-1 text-xs">Reports</TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="overview">
+                        <div className="text-xs text-slate-600 space-y-1">
+                            <p>✅ Total Tasks: {stats.total_tasks || 0}</p>
+                            <p>📊 Avg Quality: {stats.avg_quality_score?.toFixed(1) || 'N/A'}/10</p>
+                            <p>💰 Total Cost: ${stats.total_cost?.toFixed(2) || '0.00'}</p>
+                        </div>
+                    </TabsContent>
+
+                    <TabsContent value="errors" className="p-0">
+                        <AgentErrorLogViewer agentName={agent?.name || profile.agent_name} />
+                    </TabsContent>
+
+                    <TabsContent value="tasks" className="p-0">
+                        <TaskPerformanceBreakdownView agentName={agent?.name || profile.agent_name} />
+                    </TabsContent>
+
+                    <TabsContent value="reports" className="p-0">
+                        <AgentSelfReportManager agentName={agent?.name || profile.agent_name} />
+                    </TabsContent>
+                </Tabs>
             </CardContent>
         </Card>
     );
