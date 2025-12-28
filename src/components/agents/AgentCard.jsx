@@ -1,12 +1,14 @@
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Sparkles, GitBranch, Zap } from 'lucide-react';
+import { MessageSquare, Sparkles, GitBranch, Zap, Database, Globe } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 export default function AgentCard({ agent, onSelect, isSelected, onManageVersions }) {
     const capabilities = agent.capabilities || [];
     const functionTools = agent.function_tools || [];
+    const hasEntityTools = agent.tool_configs && agent.tool_configs.length > 0;
+    const hasApiCapabilities = agent.api_capabilities?.enabled;
 
     return (
         <Card 
@@ -71,24 +73,27 @@ export default function AgentCard({ agent, onSelect, isSelected, onManageVersion
                             </div>
                         </div>
                     )}
-                    
-                    {(agent.tool_configs || functionTools).length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                            {agent.tool_configs?.slice(0, 2).map((tool, idx) => (
-                                <span 
-                                    key={idx}
-                                    className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700"
-                                >
-                                    {tool.entity_name}
-                                </span>
-                            ))}
-                            {functionTools.length > 0 && (
-                                <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">
-                                    {functionTools.length} function{functionTools.length > 1 ? 's' : ''}
-                                </span>
-                            )}
-                        </div>
-                    )}
+
+                    <div className="flex flex-wrap gap-1">
+                        {hasEntityTools && (
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 flex items-center gap-1">
+                                <Database className="h-3 w-3" />
+                                {agent.tool_configs.length} entities
+                            </span>
+                        )}
+                        {functionTools.length > 0 && (
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 flex items-center gap-1">
+                                <Zap className="h-3 w-3" />
+                                {functionTools.length} function{functionTools.length > 1 ? 's' : ''}
+                            </span>
+                        )}
+                        {hasApiCapabilities && (
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 flex items-center gap-1">
+                                <Globe className="h-3 w-3" />
+                                API enabled
+                            </span>
+                        )}
+                    </div>
                 </div>
             </CardHeader>
         </Card>
