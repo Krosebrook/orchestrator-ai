@@ -31,6 +31,7 @@ import ApiDocumentationViewer from '../components/integrations/ApiDocumentationV
 import OAuthTokenManager from '../components/integrations/OAuthTokenManager';
 import ApiDiscoveryTool from '../components/integrations/ApiDiscoveryTool';
 import SmartMappingSuggestions from '../components/integrations/SmartMappingSuggestions';
+import IntegrationAssistant from '../components/integrations/IntegrationAssistant';
 
 export default function IntegrationsPage() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -506,7 +507,9 @@ export default function IntegrationsPage() {
                                         </CardContent>
                                     </Card>
 
-                                    <Tabs defaultValue="docs">
+                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                        <div className="lg:col-span-2">
+                                            <Tabs defaultValue="docs">
                                         <TabsList>
                                             <TabsTrigger value="docs">Documentation</TabsTrigger>
                                             <TabsTrigger value="oauth">OAuth</TabsTrigger>
@@ -544,8 +547,19 @@ export default function IntegrationsPage() {
                                                 }}
                                             />
                                         </TabsContent>
-                                    </Tabs>
-                                </div>
+                                            </Tabs>
+                                        </div>
+                                        <div>
+                                            <IntegrationAssistant
+                                                context={{
+                                                    mode: 'setup',
+                                                    integrationName: viewingIntegration.name,
+                                                    integrationId: viewingIntegration.id
+                                                }}
+                                            />
+                                        </div>
+                                        </div>
+                                        </div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {connections.filter(c => c.status === 'active').map((connection) => {
