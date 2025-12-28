@@ -92,6 +92,10 @@ function LayoutContent({ children, currentPageName }) {
                                 <Shield className="h-4 w-4" />
                                 Users
                             </Link>
+                            <Link to={createPageUrl('AgentProfileAdmin')} className={navLinkClass('AgentProfileAdmin')}>
+                                <Shield className="h-4 w-4" />
+                                Agent Admin
+                            </Link>
                         </>
                         )}
                         </div>

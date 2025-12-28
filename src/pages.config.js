@@ -9,6 +9,7 @@ import RoleManagement from './pages/RoleManagement';
 import UserManagement from './pages/UserManagement';
 import AgentPerformance from './pages/AgentPerformance';
 import Orchestration from './pages/Orchestration';
+import AgentProfileAdmin from './pages/AgentProfileAdmin';
 import __Layout from './Layout.jsx';
 
 
@@ -24,6 +25,7 @@ export const PAGES = {
     "UserManagement": UserManagement,
     "AgentPerformance": AgentPerformance,
     "Orchestration": Orchestration,
+    "AgentProfileAdmin": AgentProfileAdmin,
 }
 
 export const pagesConfig = {
