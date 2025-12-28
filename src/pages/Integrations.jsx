@@ -27,6 +27,10 @@ import ConnectionDialog from '../components/integrations/ConnectionDialog';
 import ServiceCatalog from '../components/integrations/ServiceCatalog';
 import SyncConfigurationDialog from '../components/integrations/SyncConfigurationDialog';
 import SyncMonitor from '../components/integrations/SyncMonitor';
+import ApiDocumentationViewer from '../components/integrations/ApiDocumentationViewer';
+import OAuthTokenManager from '../components/integrations/OAuthTokenManager';
+import ApiDiscoveryTool from '../components/integrations/ApiDiscoveryTool';
+import SmartMappingSuggestions from '../components/integrations/SmartMappingSuggestions';
 
 export default function IntegrationsPage() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -38,6 +42,7 @@ export default function IntegrationsPage() {
     const [selectedIntegration, setSelectedIntegration] = useState(null);
     const [showConnectionDialog, setShowConnectionDialog] = useState(false);
     const [showSyncDialog, setShowSyncDialog] = useState(false);
+    const [viewingIntegration, setViewingIntegration] = useState(null);
 
     useEffect(() => {
         loadUserAndConnections();
@@ -385,6 +390,10 @@ export default function IntegrationsPage() {
                             <RefreshCw className="h-4 w-4 mr-2" />
                             Data Sync
                         </TabsTrigger>
+                        <TabsTrigger value="management">
+                            <Settings className="h-4 w-4 mr-2" />
+                            API Management
+                        </TabsTrigger>
                     </TabsList>
 
                     {/* My Connections Tab */}
@@ -464,6 +473,116 @@ export default function IntegrationsPage() {
                             onConnect={handleConnect}
                             connectedServices={connections.filter(c => c.status === 'active').map(c => c.integration_id)}
                         />
+                    </TabsContent>
+
+                    {/* API Management Tab */}
+                    <TabsContent value="management" className="mt-6">
+                        <div className="space-y-6">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h2 className="text-xl font-semibold text-slate-800">API Management Suite</h2>
+                                    <p className="text-slate-600">Documentation, OAuth management, and smart mapping suggestions</p>
+                                </div>
+                            </div>
+
+                            {viewingIntegration ? (
+                                <div className="space-y-6">
+                                    <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
+                                        <CardContent className="pt-6">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <h3 className="text-xl font-bold text-slate-800">
+                                                        {viewingIntegration.name}
+                                                    </h3>
+                                                    <p className="text-sm text-slate-600">API Management & Documentation</p>
+                                                </div>
+                                                <Button
+                                                    variant="outline"
+                                                    onClick={() => setViewingIntegration(null)}
+                                                >
+                                                    Back to List
+                                                </Button>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+
+                                    <Tabs defaultValue="docs">
+                                        <TabsList>
+                                            <TabsTrigger value="docs">Documentation</TabsTrigger>
+                                            <TabsTrigger value="oauth">OAuth</TabsTrigger>
+                                            <TabsTrigger value="discovery">Discovery</TabsTrigger>
+                                            <TabsTrigger value="mapping">Smart Mapping</TabsTrigger>
+                                        </TabsList>
+
+                                        <TabsContent value="docs" className="mt-6">
+                                            <ApiDocumentationViewer
+                                                integrationId={viewingIntegration.id}
+                                                integrationName={viewingIntegration.name}
+                                            />
+                                        </TabsContent>
+
+                                        <TabsContent value="oauth" className="mt-6">
+                                            <OAuthTokenManager
+                                                connection={getConnection(viewingIntegration.id)}
+                                            />
+                                        </TabsContent>
+
+                                        <TabsContent value="discovery" className="mt-6">
+                                            <ApiDiscoveryTool
+                                                integrationId={viewingIntegration.id}
+                                                integrationName={viewingIntegration.name}
+                                            />
+                                        </TabsContent>
+
+                                        <TabsContent value="mapping" className="mt-6">
+                                            <SmartMappingSuggestions
+                                                integrationId={viewingIntegration.id}
+                                                endpointPath="/api/v1/contacts"
+                                                sourceFields={['email', 'full_name', 'phone_number', 'company_name']}
+                                                onApplySuggestion={(suggestion) => {
+                                                    console.log('Applied:', suggestion);
+                                                }}
+                                            />
+                                        </TabsContent>
+                                    </Tabs>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {connections.filter(c => c.status === 'active').map((connection) => {
+                                        const integration = integrations.find(i => i.id === connection.integration_id);
+                                        return (
+                                            <Card 
+                                                key={connection.id}
+                                                className="cursor-pointer hover:shadow-lg transition-all"
+                                                onClick={() => setViewingIntegration({
+                                                    id: connection.integration_id,
+                                                    name: connection.integration_name
+                                                })}
+                                            >
+                                                <CardHeader>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="text-3xl">{integration?.icon || '🔌'}</div>
+                                                        <div>
+                                                            <CardTitle className="text-base">
+                                                                {connection.integration_name}
+                                                            </CardTitle>
+                                                            <Badge className="mt-1 bg-green-100 text-green-700">
+                                                                Connected
+                                                            </Badge>
+                                                        </div>
+                                                    </div>
+                                                </CardHeader>
+                                                <CardContent>
+                                                    <Button variant="outline" size="sm" className="w-full">
+                                                        Manage API
+                                                    </Button>
+                                                </CardContent>
+                                            </Card>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
                     </TabsContent>
 
                     {/* Data Sync Tab */}
