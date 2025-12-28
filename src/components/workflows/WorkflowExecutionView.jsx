@@ -173,6 +173,11 @@ export default function WorkflowExecutionView({ execution, workflow, onRefresh, 
 
     const steps = workflow?.steps || [];
 
+    // Use enhanced monitor if available
+    if (workflow.nodes && workflow.nodes.length > 0) {
+        return <WorkflowExecutionMonitor execution={execution} workflow={workflow} onRefresh={onRefresh} />;
+    }
+
     return (
         <div className="space-y-6">
             {/* Execution Header */}

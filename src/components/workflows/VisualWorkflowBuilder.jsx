@@ -27,6 +27,8 @@ export default function VisualWorkflowBuilder({ workflow, agents, onSave, onCanc
     const [nodes, setNodes] = useState(workflow?.nodes || []);
     const [edges, setEdges] = useState(workflow?.edges || []);
     const [selectedNode, setSelectedNode] = useState(null);
+    const [showActionDialog, setShowActionDialog] = useState(false);
+    const [showConditionDialog, setShowConditionDialog] = useState(false);
     const [errorHandling, setErrorHandling] = useState(workflow?.error_handling || {
         max_retries: 3,
         retry_delay: 5,
