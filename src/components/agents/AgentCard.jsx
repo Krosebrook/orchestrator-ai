@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Sparkles, GitBranch, Zap, Database, Globe } from 'lucide-react';
+import { MessageSquare, Sparkles, GitBranch, Zap, Database, Globe, Target } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 export default function AgentCard({ agent, onSelect, isSelected, onManageVersions, profile }) {
@@ -91,6 +91,12 @@ export default function AgentCard({ agent, onSelect, isSelected, onManageVersion
                             <span className="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 flex items-center gap-1">
                                 <Globe className="h-3 w-3" />
                                 API enabled
+                            </span>
+                        )}
+                        {profile && (
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 flex items-center gap-1">
+                                <Target className="h-3 w-3" />
+                                {profile.performance_stats?.success_rate || 0}% success
                             </span>
                         )}
                     </div>
