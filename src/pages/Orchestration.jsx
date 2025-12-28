@@ -7,6 +7,7 @@ import { GitMerge, Plus, Activity, TrendingUp } from 'lucide-react';
 import OrchestrationBuilder from '../components/orchestration/OrchestrationBuilder';
 import OrchestrationMonitor from '../components/orchestration/OrchestrationMonitor';
 import AgentCollaborationView from '../components/orchestration/AgentCollaborationView';
+import VisualWorkflowCanvas from '../components/orchestration/VisualWorkflowCanvas';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from 'sonner';
 
@@ -16,6 +17,7 @@ export default function OrchestrationPage() {
     const [handoffs, setHandoffs] = useState([]);
     const [showBuilder, setShowBuilder] = useState(false);
     const [editingOrchestration, setEditingOrchestration] = useState(null);
+    const [selectedOrchestration, setSelectedOrchestration] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -140,6 +142,7 @@ export default function OrchestrationPage() {
                 <Tabs defaultValue="orchestrations" className="space-y-6">
                     <TabsList className="bg-white">
                         <TabsTrigger value="orchestrations">Orchestrations</TabsTrigger>
+                        <TabsTrigger value="visual">Visual Workflow</TabsTrigger>
                         <TabsTrigger value="monitor">Live Monitor</TabsTrigger>
                         <TabsTrigger value="collaboration">Collaboration View</TabsTrigger>
                     </TabsList>
@@ -148,10 +151,7 @@ export default function OrchestrationPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {orchestrations.map((orch) => (
                                 <Card key={orch.id} className="hover:shadow-lg transition-all cursor-pointer"
-                                    onClick={() => {
-                                        setEditingOrchestration(orch);
-                                        setShowBuilder(true);
-                                    }}
+                                    onClick={() => setSelectedOrchestration(orch)}
                                 >
                                     <CardHeader>
                                         <CardTitle className="text-base">{orch.name}</CardTitle>
@@ -163,10 +163,62 @@ export default function OrchestrationPage() {
                                             <p><strong>Protocol:</strong> {orch.communication_protocol}</p>
                                             <p><strong>Status:</strong> <span className="capitalize">{orch.status}</span></p>
                                         </div>
+                                        <div className="flex gap-2 mt-3">
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setEditingOrchestration(orch);
+                                                    setShowBuilder(true);
+                                                }}
+                                                className="flex-1"
+                                            >
+                                                Edit
+                                            </Button>
+                                        </div>
                                     </CardContent>
                                 </Card>
                             ))}
                         </div>
+                    </TabsContent>
+
+                    <TabsContent value="visual">
+                        {selectedOrchestration ? (
+                            <div className="space-y-4">
+                                <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+                                    <CardContent className="pt-6">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h3 className="text-xl font-bold text-slate-800">{selectedOrchestration.name}</h3>
+                                                <p className="text-sm text-slate-600">{selectedOrchestration.description}</p>
+                                            </div>
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => setSelectedOrchestration(null)}
+                                            >
+                                                Back to List
+                                            </Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                                <VisualWorkflowCanvas 
+                                    orchestration={selectedOrchestration}
+                                    handoffs={handoffs}
+                                    realTime={true}
+                                />
+                            </div>
+                        ) : (
+                            <Card>
+                                <CardContent className="pt-12 pb-12 text-center">
+                                    <GitMerge className="h-16 w-16 text-slate-300 mx-auto mb-4" />
+                                    <p className="text-slate-500 mb-4">Select an orchestration to visualize its workflow</p>
+                                    <Button onClick={() => orchestrations.length > 0 && setSelectedOrchestration(orchestrations[0])}>
+                                        View First Orchestration
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        )}
                     </TabsContent>
 
                     <TabsContent value="monitor">
