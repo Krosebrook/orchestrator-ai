@@ -7,11 +7,16 @@ import { Shield, FileText } from 'lucide-react';
 import AgentSelfReportManager from '../components/agents/AgentSelfReportManager';
 import AgentErrorLogViewer from '../components/agents/AgentErrorLogViewer';
 import TaskPerformanceBreakdownView from '../components/agents/TaskPerformanceBreakdownView';
+import AISkillGapAnalysis from '../components/agents/AISkillGapAnalysis';
+import AILearningPathGenerator from '../components/agents/AILearningPathGenerator';
+import AIFeedbackSynthesizer from '../components/agents/AIFeedbackSynthesizer';
+import { Badge } from "@/components/ui/badge";
 
 export default function AgentProfileAdminPage() {
     const [agents, setAgents] = useState([]);
     const [selectedAgent, setSelectedAgent] = useState('');
     const [user, setUser] = useState(null);
+    const [agentProfiles, setAgentProfiles] = useState([]);
 
     useEffect(() => {
         loadData();
@@ -19,13 +24,15 @@ export default function AgentProfileAdminPage() {
 
     const loadData = async () => {
         try {
-            const [currentUser, agentsList] = await Promise.all([
+            const [currentUser, agentsList, profilesList] = await Promise.all([
                 base44.auth.me(),
-                base44.agents.listAgents()
+                base44.agents.listAgents(),
+                base44.entities.AgentProfile.list()
             ]);
             
             setUser(currentUser);
             setAgents(agentsList || []);
+            setAgentProfiles(profilesList || []);
             if (agentsList && agentsList.length > 0) {
                 setSelectedAgent(agentsList[0].name);
             }
@@ -80,8 +87,9 @@ export default function AgentProfileAdminPage() {
                 </Card>
 
                 {selectedAgent && (
-                    <Tabs defaultValue="reports">
+                    <Tabs defaultValue="ai-insights">
                         <TabsList className="bg-white">
+                            <TabsTrigger value="ai-insights">AI Insights</TabsTrigger>
                             <TabsTrigger value="reports">
                                 <FileText className="h-4 w-4 mr-2" />
                                 Self-Reports
@@ -89,6 +97,22 @@ export default function AgentProfileAdminPage() {
                             <TabsTrigger value="errors">Error Logs</TabsTrigger>
                             <TabsTrigger value="performance">Performance</TabsTrigger>
                         </TabsList>
+
+                        <TabsContent value="ai-insights" className="mt-6">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <AISkillGapAnalysis 
+                                    agentName={selectedAgent} 
+                                    profile={agentProfiles.find(p => p.agent_name === selectedAgent)}
+                                />
+                                <AILearningPathGenerator 
+                                    agentName={selectedAgent}
+                                    profile={agentProfiles.find(p => p.agent_name === selectedAgent)}
+                                />
+                            </div>
+                            <div className="mt-6">
+                                <AIFeedbackSynthesizer agentName={selectedAgent} />
+                            </div>
+                        </TabsContent>
 
                         <TabsContent value="reports" className="mt-6">
                             <AgentSelfReportManager agentName={selectedAgent} isAdmin={true} />
