@@ -5,6 +5,8 @@ import Landing from './pages/Landing';
 import Workflows from './pages/Workflows';
 import Deployments from './pages/Deployments';
 import GettingStarted from './pages/GettingStarted';
+import RoleManagement from './pages/RoleManagement';
+import UserManagement from './pages/UserManagement';
 import __Layout from './Layout.jsx';
 
 
@@ -16,6 +18,8 @@ export const PAGES = {
     "Workflows": Workflows,
     "Deployments": Deployments,
     "GettingStarted": GettingStarted,
+    "RoleManagement": RoleManagement,
+    "UserManagement": UserManagement,
 }
 
 export const pagesConfig = {

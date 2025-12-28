@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { LayoutDashboard, Bot, Workflow, Home, Plug, Rocket, BookOpen } from 'lucide-react';
+import { LayoutDashboard, Bot, Workflow, Home, Plug, Rocket, BookOpen, Shield } from 'lucide-react';
+import { PermissionsProvider, usePermissions } from './components/rbac/PermissionCheck';
 
-export default function Layout({ children, currentPageName }) {
+function LayoutContent({ children, currentPageName }) {
+    const { canAccessResource, loading } = usePermissions();
+    
     const navLinkClass = (pageName) => {
         const isActive = currentPageName === pageName;
         return `flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
@@ -11,6 +14,15 @@ export default function Layout({ children, currentPageName }) {
                 : 'text-slate-600 hover:bg-slate-100'
         }`;
     };
+
+    if (loading) {
+        return <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+            <div className="text-center">
+                <Shield className="h-12 w-12 text-blue-600 mx-auto mb-3 animate-pulse" />
+                <p className="text-slate-600">Loading permissions...</p>
+            </div>
+        </div>;
+    }
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -38,22 +50,42 @@ export default function Layout({ children, currentPageName }) {
                         <LayoutDashboard className="h-4 w-4" />
                         Dashboard
                         </Link>
+                        {canAccessResource('agents') && (
                         <Link to={createPageUrl('Agents')} className={navLinkClass('Agents')}>
-                        <Bot className="h-4 w-4" />
-                        Agents
+                            <Bot className="h-4 w-4" />
+                            Agents
                         </Link>
+                        )}
+                        {canAccessResource('workflows') && (
                         <Link to={createPageUrl('Workflows')} className={navLinkClass('Workflows')}>
-                        <Workflow className="h-4 w-4" />
-                        Workflows
+                            <Workflow className="h-4 w-4" />
+                            Workflows
                         </Link>
+                        )}
+                        {canAccessResource('integrations') && (
                         <Link to={createPageUrl('Integrations')} className={navLinkClass('Integrations')}>
-                        <Plug className="h-4 w-4" />
-                        Integrations
+                            <Plug className="h-4 w-4" />
+                            Integrations
                         </Link>
+                        )}
+                        {canAccessResource('deployments') && (
                         <Link to={createPageUrl('Deployments')} className={navLinkClass('Deployments')}>
-                        <Rocket className="h-4 w-4" />
-                        Deployments
+                            <Rocket className="h-4 w-4" />
+                            Deployments
                         </Link>
+                        )}
+                        {canAccessResource('admin') && (
+                        <>
+                            <Link to={createPageUrl('RoleManagement')} className={navLinkClass('RoleManagement')}>
+                                <Shield className="h-4 w-4" />
+                                Roles
+                            </Link>
+                            <Link to={createPageUrl('UserManagement')} className={navLinkClass('UserManagement')}>
+                                <Shield className="h-4 w-4" />
+                                Users
+                            </Link>
+                        </>
+                        )}
                         </div>
                     </div>
                 </div>
@@ -64,5 +96,13 @@ export default function Layout({ children, currentPageName }) {
                 {children}
             </main>
         </div>
-    );
-}
+        );
+        }
+
+        export default function Layout({ children, currentPageName }) {
+        return (
+        <PermissionsProvider>
+        <LayoutContent children={children} currentPageName={currentPageName} />
+        </PermissionsProvider>
+        );
+        }
