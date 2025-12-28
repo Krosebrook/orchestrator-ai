@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { LayoutDashboard, Bot, Workflow, Home, Plug, Rocket, BookOpen, Shield, BarChart3, GitMerge } from 'lucide-react';
+import { LayoutDashboard, Bot, Workflow, Home, Plug, Rocket, BookOpen, Shield, BarChart3, GitMerge, Users } from 'lucide-react';
 import { PermissionsProvider, usePermissions } from './components/rbac/PermissionCheck';
 
 function LayoutContent({ children, currentPageName }) {
@@ -81,6 +81,10 @@ function LayoutContent({ children, currentPageName }) {
                         <Link to={createPageUrl('Orchestration')} className={navLinkClass('Orchestration')}>
                             <GitMerge className="h-4 w-4" />
                             Orchestration
+                        </Link>
+                        <Link to={createPageUrl('AgentCollaborationHub')} className={navLinkClass('AgentCollaborationHub')}>
+                            <Users className="h-4 w-4" />
+                            Collaboration
                         </Link>
                         {canAccessResource('admin') && (
                         <>
