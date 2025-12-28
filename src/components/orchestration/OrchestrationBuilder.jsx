@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, ArrowRight, Save } from 'lucide-react';
+import ProfileAwareOrchestrationHelper from './ProfileAwareOrchestrationHelper';
 
 export default function OrchestrationBuilder({ orchestration, agents, onSave, onCancel }) {
     const [name, setName] = useState(orchestration?.name || '');
@@ -95,6 +96,11 @@ export default function OrchestrationBuilder({ orchestration, agents, onSave, on
                 <Label>Description</Label>
                 <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} />
             </div>
+
+            <ProfileAwareOrchestrationHelper 
+                selectedAgents={selectedAgents}
+                onSuggestion={(suggestion) => console.log('Suggestion:', suggestion)}
+            />
 
             <div>
                 <Label className="mb-2 block">Participating Agents</Label>

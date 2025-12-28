@@ -7,6 +7,7 @@ import AgentCard from '../components/agents/AgentCard';
 import ConversationList from '../components/agents/ConversationList';
 import ChatWindow from '../components/agents/ChatWindow';
 import AgentVersionManager from '../components/agents/AgentVersionManager';
+import AgentProfileCard from '../components/agents/AgentProfileCard';
 
 export default function AgentsPage() {
     const [agents, setAgents] = useState([]);
@@ -18,6 +19,7 @@ export default function AgentsPage() {
     const [versionManagerOpen, setVersionManagerOpen] = useState(false);
     const [selectedAgentForVersions, setSelectedAgentForVersions] = useState(null);
     const [showCapabilities, setShowCapabilities] = useState(false);
+    const [agentProfiles, setAgentProfiles] = useState([]);
 
     useEffect(() => {
         loadAgents();
@@ -31,8 +33,12 @@ export default function AgentsPage() {
 
     const loadAgents = async () => {
         try {
-            const agentsList = await base44.agents.listAgents();
+            const [agentsList, profilesList] = await Promise.all([
+                base44.agents.listAgents(),
+                base44.entities.AgentProfile.list()
+            ]);
             setAgents(agentsList || []);
+            setAgentProfiles(profilesList || []);
             if (agentsList && agentsList.length > 0) {
                 setSelectedAgent(agentsList[0]);
             }
@@ -154,18 +160,22 @@ export default function AgentsPage() {
                     <div className="max-w-6xl mx-auto">
                         <h2 className="text-xl font-semibold text-slate-800 mb-6">Select an Agent</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {agents.map((agent) => (
-                                <AgentCard
-                                    key={agent.name}
-                                    agent={agent}
-                                    onSelect={setSelectedAgent}
-                                    isSelected={selectedAgent?.name === agent.name}
-                                    onManageVersions={(agent) => {
-                                        setSelectedAgentForVersions(agent);
-                                        setVersionManagerOpen(true);
-                                    }}
-                                />
-                            ))}
+                            {agents.map((agent) => {
+                                const profile = agentProfiles.find(p => p.agent_name === agent.name);
+                                return (
+                                    <AgentCard
+                                        key={agent.name}
+                                        agent={agent}
+                                        profile={profile}
+                                        onSelect={setSelectedAgent}
+                                        isSelected={selectedAgent?.name === agent.name}
+                                        onManageVersions={(agent) => {
+                                            setSelectedAgentForVersions(agent);
+                                            setVersionManagerOpen(true);
+                                        }}
+                                    />
+                                );
+                            })}
                         </div>
 
                         {selectedAgent && conversations.length > 0 && (
@@ -207,10 +217,20 @@ export default function AgentsPage() {
                     </div>
 
                     {/* Chat Window */}
-                    <ChatWindow 
-                        conversation={selectedConversation} 
-                        agent={selectedAgent}
-                    />
+                    <div className="flex-1 flex overflow-hidden">
+                        <div className="flex-1">
+                            <ChatWindow 
+                                conversation={selectedConversation} 
+                                agent={selectedAgent}
+                            />
+                        </div>
+                        <div className="hidden xl:block w-80 border-l bg-slate-50 overflow-y-auto p-4">
+                            <AgentProfileCard 
+                                profile={agentProfiles.find(p => p.agent_name === selectedAgent?.name)}
+                                agent={selectedAgent}
+                            />
+                        </div>
+                    </div>
                 </div>
             )}
 

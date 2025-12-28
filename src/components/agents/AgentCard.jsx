@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { MessageSquare, Sparkles, GitBranch, Zap, Database, Globe } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
-export default function AgentCard({ agent, onSelect, isSelected, onManageVersions }) {
+export default function AgentCard({ agent, onSelect, isSelected, onManageVersions, profile }) {
     const capabilities = agent.capabilities || [];
     const functionTools = agent.function_tools || [];
     const hasEntityTools = agent.tool_configs && agent.tool_configs.length > 0;
