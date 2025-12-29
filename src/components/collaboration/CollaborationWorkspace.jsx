@@ -3,8 +3,9 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Send, FileText } from 'lucide-react';
+import { ArrowLeft, Send, FileText, BookOpen } from 'lucide-react';
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from 'sonner';
 import AgentInteractionTimeline from './AgentInteractionTimeline';
 import SharedContextPanel from './SharedContextPanel';
 import ProposalVotingSystem from './ProposalVotingSystem';
@@ -13,13 +14,59 @@ export default function CollaborationWorkspace({ session, agents, onBack }) {
     const [currentSession, setCurrentSession] = useState(session);
     const [userInput, setUserInput] = useState('');
     const [loading, setLoading] = useState(false);
+    const [knowledgeArticles, setKnowledgeArticles] = useState([]);
 
     useEffect(() => {
         const interval = setInterval(() => {
             refreshSession();
         }, 3000);
+        loadKnowledge();
         return () => clearInterval(interval);
     }, [currentSession.id]);
+
+    const loadKnowledge = async () => {
+        try {
+            const articles = await base44.entities.KnowledgeArticle.list('-access_count', 20);
+            setKnowledgeArticles(articles || []);
+        } catch (error) {
+            console.error('Failed to load knowledge:', error);
+        }
+    };
+
+    const shareKnowledge = async (articleId) => {
+        try {
+            const article = knowledgeArticles.find(a => a.id === articleId);
+            if (!article) return;
+
+            await base44.entities.KnowledgeArticle.update(article.id, {
+                access_count: (article.access_count || 0) + 1
+            });
+            
+            const updatedSession = await base44.entities.AgentCollaborationSession.filter({ id: currentSession.id });
+            const current = updatedSession[0];
+            
+            await base44.entities.AgentCollaborationSession.update(currentSession.id, {
+                shared_context: {
+                    ...current.shared_context,
+                    shared_knowledge: [
+                        ...(current.shared_context?.shared_knowledge || []),
+                        {
+                            article_id: article.id,
+                            title: article.title,
+                            content: article.content,
+                            shared_at: new Date().toISOString()
+                        }
+                    ]
+                }
+            });
+            
+            toast.success('Knowledge shared with agents');
+            await refreshSession();
+        } catch (error) {
+            console.error('Failed to share knowledge:', error);
+            toast.error('Failed to share knowledge');
+        }
+    };
 
     const refreshSession = async () => {
         try {
@@ -203,6 +250,38 @@ Please respond with your contribution to this collaboration.`;
                     </div>
 
                     <div className="space-y-6">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-sm flex items-center gap-2">
+                                    <BookOpen className="h-4 w-4" />
+                                    Share Knowledge
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                <Select onValueChange={shareKnowledge}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select article to share" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {knowledgeArticles.map(article => (
+                                            <SelectItem key={article.id} value={article.id}>
+                                                {article.title}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                
+                                {currentSession.shared_context?.shared_knowledge?.length > 0 && (
+                                    <div className="space-y-1">
+                                        <p className="text-xs font-semibold">Shared:</p>
+                                        {currentSession.shared_context.shared_knowledge.map((k, idx) => (
+                                            <p key={idx} className="text-xs text-slate-600">📚 {k.title}</p>
+                                        ))}
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+
                         <SharedContextPanel
                             context={currentSession.shared_context || {}}
                             onUpdate={updateSharedContext}
