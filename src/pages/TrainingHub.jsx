@@ -10,6 +10,8 @@ import TrainingModuleCard from '../components/training/TrainingModuleCard';
 import ScenarioSimulator from '../components/training/ScenarioSimulator';
 import TrainingRecommendations from '../components/training/TrainingRecommendations';
 import TrainingAnalytics from '../components/training/TrainingAnalytics';
+import AICoachingSystem from '../components/training/AICoachingSystem';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function TrainingHubPage() {
     const [agents, setAgents] = useState([]);
@@ -20,6 +22,7 @@ export default function TrainingHubPage() {
     const [showModuleCreator, setShowModuleCreator] = useState(false);
     const [selectedModule, setSelectedModule] = useState(null);
     const [activeSimulation, setActiveSimulation] = useState(null);
+    const [selectedAgentForCoaching, setSelectedAgentForCoaching] = useState(null);
 
     useEffect(() => {
         loadData();
@@ -162,6 +165,7 @@ export default function TrainingHubPage() {
                 <Tabs defaultValue="modules">
                     <TabsList className="bg-white">
                         <TabsTrigger value="modules">Training Modules</TabsTrigger>
+                        <TabsTrigger value="coaching">AI Coaching</TabsTrigger>
                         <TabsTrigger value="recommendations">AI Recommendations</TabsTrigger>
                         <TabsTrigger value="analytics">Analytics</TabsTrigger>
                     </TabsList>
@@ -188,6 +192,32 @@ export default function TrainingHubPage() {
                                     />
                                 ))}
                             </div>
+                        )}
+                    </TabsContent>
+
+                    <TabsContent value="coaching" className="mt-6 space-y-6">
+                        <Card>
+                            <CardContent className="pt-4">
+                                <div className="flex items-center gap-3">
+                                    <label className="text-sm font-medium">Select Agent for Coaching:</label>
+                                    <Select value={selectedAgentForCoaching} onValueChange={setSelectedAgentForCoaching}>
+                                        <SelectTrigger className="w-64">
+                                            <SelectValue placeholder="Choose agent" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {agents.map(agent => (
+                                                <SelectItem key={agent.name} value={agent.name}>
+                                                    {agent.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </CardContent>
+                        </Card>
+                        
+                        {selectedAgentForCoaching && (
+                            <AICoachingSystem agentName={selectedAgentForCoaching} />
                         )}
                     </TabsContent>
 
