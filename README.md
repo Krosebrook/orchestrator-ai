@@ -95,11 +95,13 @@ Built with modern web technologies:
 
 See [ROADMAP.md](./ROADMAP.md) for the complete feature roadmap including:
 
-- **Phase 1**: Foundation & Stability (Quarter 1)
-- **Phase 2**: Enhanced Intelligence (Quarter 2)
-- **Phase 3**: Enterprise Readiness (Quarter 3)
-- **Phase 4**: Advanced Capabilities (Quarter 4)
-- **Phase 5**: AI-First Platform (Quarter 5)
+*Phases are sequential, each lasting approximately 3 months:*
+
+- **Phase 1**: Foundation & Stability
+- **Phase 2**: Enhanced Intelligence
+- **Phase 3**: Enterprise Readiness
+- **Phase 4**: Advanced Capabilities
+- **Phase 5**: AI-First Platform
 
 ## 🔍 Technical Audit
 

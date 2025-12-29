@@ -41,7 +41,7 @@ Transform the AI Orchestrator Platform into the industry-leading solution for en
 
 ## 🗓️ Roadmap Overview
 
-*Note: Phases are planned relative to the start of implementation. If starting in December 2024, Phase 1 would run Q1 2025, etc.*
+*Note: Phases are planned relative to the start of implementation. Each phase is 3 months (one quarter).*
 
 ```
 Phase 1         Phase 2         Phase 3         Phase 4         Phase 5
