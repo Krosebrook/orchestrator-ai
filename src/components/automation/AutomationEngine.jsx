@@ -38,6 +38,8 @@ export function useAutomationEngine() {
                         result = await categorizeQuery(query, rule);
                     } else if (rule.action_type === 'draft_response') {
                         result = await draftResponse(query, rule);
+                    } else if (rule.action_type === 'assign_agent') {
+                        result = await delegateTask(query.query, rule);
                     }
                 }
             } else if (rule.trigger_type === 'workflow_start') {
@@ -50,6 +52,20 @@ export function useAutomationEngine() {
                 for (const execution of executions) {
                     if (rule.action_type === 'validate') {
                         result = await validateWorkflowData(execution, rule);
+                    } else if (rule.action_type === 'assign_agent') {
+                        result = await delegateTask(execution.initial_input, rule);
+                    }
+                }
+            } else if (rule.trigger_type === 'collaboration_request') {
+                const sessions = await base44.entities.AgentCollaborationSession.filter(
+                    { status: 'active' },
+                    '-created_date',
+                    5
+                );
+
+                for (const session of sessions) {
+                    if (rule.action_type === 'assign_agent' && session.participating_agents?.length < 3) {
+                        result = await delegateTask(session.goal, rule);
                     }
                 }
             }
@@ -150,6 +166,56 @@ Return validation status and issues.`,
         });
 
         return { trigger: execution, data: result };
+    };
+
+    const delegateTask = async (taskDescription, rule) => {
+        const agents = await base44.agents.listAgents();
+        const [profiles, metrics] = await Promise.all([
+            base44.entities.AgentProfile.list(),
+            base44.entities.AgentPerformanceMetric.list('-created_date', 500)
+        ]);
+
+        const agentScores = agents.map(agent => {
+            const agentMetrics = metrics.filter(m => m.agent_name === agent.name);
+            const profile = profiles.find(p => p.agent_name === agent.name);
+            const successRate = agentMetrics.length > 0 
+                ? agentMetrics.filter(m => m.status === 'success').length / agentMetrics.length
+                : 0.5;
+
+            return {
+                name: agent.name,
+                score: successRate,
+                strengths: profile?.strengths || [],
+                specialties: profile?.specialty_areas || []
+            };
+        });
+
+        const result = await base44.integrations.Core.InvokeLLM({
+            prompt: `Delegate task to best agent: "${taskDescription}"
+
+Agents:
+${agentScores.map(a => `${a.name}: Success ${(a.score * 100).toFixed(0)}%, Strengths: ${a.strengths.join(', ')}`).join('\n')}
+
+Choose best agent and provide reasoning.`,
+            response_json_schema: {
+                type: "object",
+                properties: {
+                    best_agent: { type: "string" },
+                    reasoning: { type: "string" },
+                    complexity: { type: "number" }
+                }
+            }
+        });
+
+        await base44.entities.TaskDelegation.create({
+            task_description: taskDescription,
+            assigned_to: result.best_agent,
+            assignment_reasoning: result.reasoning,
+            complexity_score: result.complexity,
+            status: 'pending'
+        });
+
+        return { trigger: { task: taskDescription }, data: result };
     };
 }
 

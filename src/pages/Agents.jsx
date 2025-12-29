@@ -10,6 +10,7 @@ import AgentVersionManager from '../components/agents/AgentVersionManager';
 import AgentProfileCard from '../components/agents/AgentProfileCard';
 import AutomationRuleManager from '../components/automation/AutomationRuleManager';
 import AutomationEngine from '../components/automation/AutomationEngine';
+import { IntelligentTaskDelegator } from '../components/automation/IntelligentTaskDelegator';
 
 export default function AgentsPage() {
     const [agents, setAgents] = useState([]);
@@ -172,7 +173,8 @@ export default function AgentsPage() {
                 <div className="flex-1 overflow-auto px-6 py-8">
                     <div className="max-w-6xl mx-auto">
                         {showCapabilities && (
-                            <div className="mb-6">
+                            <div className="mb-6 space-y-6">
+                                <IntelligentTaskDelegator agents={agents} />
                                 <AutomationRuleManager agents={agents} />
                             </div>
                         )}
