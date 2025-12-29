@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { LayoutDashboard, Bot, Workflow, Home, Plug, Rocket, BookOpen, Shield, BarChart3, GitMerge, Users, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Bot, Workflow, Home, Plug, Rocket, BookOpen, Shield, BarChart3, GitMerge, Users, Sparkles, Activity } from 'lucide-react';
 import { PermissionsProvider, usePermissions } from './components/rbac/PermissionCheck';
 
 function LayoutContent({ children, currentPageName }) {
@@ -89,6 +89,10 @@ function LayoutContent({ children, currentPageName }) {
                         <Link to={createPageUrl('TrainingHub')} className={navLinkClass('TrainingHub')}>
                             <Sparkles className="h-4 w-4" />
                             Training
+                        </Link>
+                        <Link to={createPageUrl('MonitoringDashboard')} className={navLinkClass('MonitoringDashboard')}>
+                            <Activity className="h-4 w-4" />
+                            Monitoring
                         </Link>
                         {canAccessResource('admin') && (
                         <>
