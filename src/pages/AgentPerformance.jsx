@@ -11,6 +11,7 @@ import ApiCallsChart from '../components/performance/ApiCallsChart';
 import ExecutionTimeChart from '../components/performance/ExecutionTimeChart';
 import SatisfactionChart from '../components/performance/SatisfactionChart';
 import MetricsTable from '../components/performance/MetricsTable';
+import AutomatedPerformanceEvaluator from '../components/performance/AutomatedPerformanceEvaluator';
 
 export default function AgentPerformancePage() {
     const [metrics, setMetrics] = useState([]);
@@ -141,8 +142,12 @@ export default function AgentPerformancePage() {
                 <PerformanceOverview metrics={metrics} />
 
                 {/* Charts */}
-                <Tabs defaultValue="completion" className="space-y-6">
+                <Tabs defaultValue="overview" className="space-y-6">
                     <TabsList className="bg-white">
+                        <TabsTrigger value="overview">
+                            <BarChart3 className="h-4 w-4 mr-2" />
+                            AI Evaluation
+                        </TabsTrigger>
                         <TabsTrigger value="completion">
                             <TrendingUp className="h-4 w-4 mr-2" />
                             Task Completion
@@ -164,6 +169,10 @@ export default function AgentPerformancePage() {
                             Details
                         </TabsTrigger>
                     </TabsList>
+
+                    <TabsContent value="overview">
+                        <AutomatedPerformanceEvaluator agents={agents} />
+                    </TabsContent>
 
                     <TabsContent value="completion">
                         <TaskCompletionChart metrics={metrics} />
