@@ -13,6 +13,7 @@ import UserManagement from './pages/UserManagement';
 import Workflows from './pages/Workflows';
 import TrainingHub from './pages/TrainingHub';
 import MonitoringDashboard from './pages/MonitoringDashboard';
+import KnowledgeBase from './pages/KnowledgeBase';
 import __Layout from './Layout.jsx';
 
 
@@ -32,6 +33,7 @@ export const PAGES = {
     "Workflows": Workflows,
     "TrainingHub": TrainingHub,
     "MonitoringDashboard": MonitoringDashboard,
+    "KnowledgeBase": KnowledgeBase,
 }
 
 export const pagesConfig = {

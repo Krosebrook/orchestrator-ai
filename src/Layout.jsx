@@ -94,6 +94,10 @@ function LayoutContent({ children, currentPageName }) {
                             <Activity className="h-4 w-4" />
                             Monitoring
                         </Link>
+                        <Link to={createPageUrl('KnowledgeBase')} className={navLinkClass('KnowledgeBase')}>
+                            <BookOpen className="h-4 w-4" />
+                            Knowledge
+                        </Link>
                         {canAccessResource('admin') && (
                         <>
                             <Link to={createPageUrl('RoleManagement')} className={navLinkClass('RoleManagement')}>
