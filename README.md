@@ -9,6 +9,7 @@ This repository includes comprehensive documentation:
 - **[PRD.md](./PRD.md)** - Complete Product Requirements Document with feature inventory
 - **[ROADMAP.md](./ROADMAP.md)** - Feature roadmap with phases and timelines  
 - **[TECHNICAL_AUDIT.md](./TECHNICAL_AUDIT.md)** - Detailed technical audit and assessment
+- **[RECOMMENDATIONS.md](./RECOMMENDATIONS.md)** - 🆕 Implementation recommendations, repository integrations, and GitHub agent prompts
 
 ## 🚀 Quick Start
 
