@@ -16,6 +16,8 @@ import { toast } from 'sonner';
 import moment from 'moment';
 import VersionComparison from './VersionComparison';
 import DeploymentTracker from './DeploymentTracker';
+import AIDeploymentRiskAssessment from './AIDeploymentRiskAssessment';
+import AutomatedRollbackMonitor from './AutomatedRollbackMonitor';
 
 export default function AgentVersionManager({ open, onClose, agentName, currentConfig }) {
     const [versions, setVersions] = useState([]);
@@ -28,6 +30,8 @@ export default function AgentVersionManager({ open, onClose, agentName, currentC
         tags: []
     });
     const [compareVersions, setCompareVersions] = useState({ v1: null, v2: null });
+    const [deployingVersion, setDeployingVersion] = useState(null);
+    const [riskAssessment, setRiskAssessment] = useState(null);
 
     useEffect(() => {
         if (open && agentName) {
@@ -105,14 +109,22 @@ export default function AgentVersionManager({ open, onClose, agentName, currentC
         }
     };
 
-    const handleDeploy = async (version) => {
-        if (!confirm(`Deploy version ${version.version}? This will make it the active version.`)) return;
+    const handleInitiateDeploy = (version) => {
+        setDeployingVersion(version);
+        setRiskAssessment(null);
+    };
+
+    const handleDeploy = async (version, assessment) => {
+        if (assessment && assessment.go_no_go !== 'go') {
+            if (!confirm(`AI recommends NOT to deploy due to ${assessment.risk_level} risk. Deploy anyway?`)) {
+                return;
+            }
+        }
 
         try {
             const user = await base44.auth.me();
             const currentActive = versions.find(v => v.is_active);
             
-            // Get current performance metrics for comparison
             const metrics = await base44.entities.AgentPerformanceMetric.filter(
                 { agent_name: agentName },
                 '-created_date',
@@ -126,7 +138,6 @@ export default function AgentVersionManager({ open, onClose, agentName, currentC
                 ? (metrics.reduce((sum, m) => sum + (m.execution_time_ms || 0), 0) / metrics.length / 1000).toFixed(2)
                 : 0;
 
-            // Deactivate current active version
             if (currentActive) {
                 await base44.entities.AgentVersion.update(currentActive.id, { 
                     is_active: false,
@@ -134,7 +145,6 @@ export default function AgentVersionManager({ open, onClose, agentName, currentC
                 });
             }
 
-            // Deploy and activate selected version
             await base44.entities.AgentVersion.update(version.id, {
                 is_active: true,
                 status: 'deployed',
@@ -146,11 +156,44 @@ export default function AgentVersionManager({ open, onClose, agentName, currentC
                 }
             });
 
-            toast.success(`Version ${version.version} deployed successfully`);
+            toast.success(`Version ${version.version} deployed - Monitoring active`);
+            setDeployingVersion(null);
             await loadVersions();
         } catch (error) {
             console.error('Failed to deploy version:', error);
             toast.error('Failed to deploy version');
+        }
+    };
+
+    const handleAutoRollback = async (version, issues) => {
+        try {
+            const previousVersion = versions.find(v => v.id === version.previous_version_id);
+            
+            if (!previousVersion) {
+                toast.error('No previous version available for rollback');
+                return;
+            }
+
+            const user = await base44.auth.me();
+
+            await base44.entities.AgentVersion.update(version.id, { 
+                is_active: false,
+                status: 'rolled_back',
+                rollback_count: (version.rollback_count || 0) + 1
+            });
+
+            await base44.entities.AgentVersion.update(previousVersion.id, {
+                is_active: true,
+                status: 'deployed',
+                deployed_at: new Date().toISOString(),
+                deployed_by: `auto-rollback (${user.email})`
+            });
+
+            toast.success(`Auto-rollback completed: Reverted to v${previousVersion.version}`);
+            await loadVersions();
+        } catch (error) {
+            console.error('Auto-rollback failed:', error);
+            toast.error('Auto-rollback failed - manual intervention required');
         }
     };
 
@@ -381,7 +424,7 @@ export default function AgentVersionManager({ open, onClose, agentName, currentC
                                                 {version.status === 'draft' && (
                                                    <Button
                                                        size="sm"
-                                                       onClick={() => handleDeploy(version)}
+                                                       onClick={() => handleInitiateDeploy(version)}
                                                    >
                                                        Deploy
                                                    </Button>
@@ -460,6 +503,14 @@ export default function AgentVersionManager({ open, onClose, agentName, currentC
                         <TabsContent value="deployments" className="mt-4">
                             <ScrollArea className="h-96">
                                 <div className="space-y-3">
+                                    {activeVersion && (
+                                        <AutomatedRollbackMonitor
+                                            agentName={agentName}
+                                            deployedVersion={activeVersion}
+                                            onRollbackTriggered={handleAutoRollback}
+                                        />
+                                    )}
+                                    
                                     {versions.filter(v => v.status !== 'draft').length === 0 ? (
                                         <p className="text-center text-slate-500 py-8">
                                             No deployments yet
@@ -472,7 +523,7 @@ export default function AgentVersionManager({ open, onClose, agentName, currentC
                                                     key={version.id}
                                                     version={version}
                                                     isActive={version.is_active}
-                                                    onDeploy={handleDeploy}
+                                                    onDeploy={handleInitiateDeploy}
                                                     onRollback={handleRollback}
                                                     onArchive={handleArchive}
                                                 />
@@ -483,6 +534,35 @@ export default function AgentVersionManager({ open, onClose, agentName, currentC
                         </TabsContent>
                     </Tabs>
                 </div>
+
+                {/* Deployment Risk Assessment Dialog */}
+                <Dialog open={!!deployingVersion} onOpenChange={() => setDeployingVersion(null)}>
+                    <DialogContent className="max-w-2xl">
+                        <DialogHeader>
+                            <DialogTitle>Deploy Version {deployingVersion?.version}</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                            <AIDeploymentRiskAssessment
+                                version={deployingVersion}
+                                agentName={agentName}
+                                onAssessmentComplete={(assessment) => setRiskAssessment(assessment)}
+                            />
+                            
+                            <div className="flex justify-end gap-2 pt-4 border-t">
+                                <Button variant="outline" onClick={() => setDeployingVersion(null)}>
+                                    Cancel
+                                </Button>
+                                <Button 
+                                    onClick={() => handleDeploy(deployingVersion, riskAssessment)}
+                                    disabled={!riskAssessment}
+                                    className={riskAssessment?.go_no_go === 'no-go' ? 'bg-orange-600' : ''}
+                                >
+                                    {riskAssessment?.go_no_go === 'no-go' ? 'Deploy Anyway' : 'Deploy'}
+                                </Button>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </DialogContent>
         </Dialog>
     );
