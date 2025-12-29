@@ -8,6 +8,8 @@ import ConversationList from '../components/agents/ConversationList';
 import ChatWindow from '../components/agents/ChatWindow';
 import AgentVersionManager from '../components/agents/AgentVersionManager';
 import AgentProfileCard from '../components/agents/AgentProfileCard';
+import AutomationRuleManager from '../components/automation/AutomationRuleManager';
+import AutomationEngine from '../components/automation/AutomationEngine';
 
 export default function AgentsPage() {
     const [agents, setAgents] = useState([]);
@@ -117,6 +119,7 @@ export default function AgentsPage() {
 
     return (
         <div className="h-screen flex flex-col bg-slate-50">
+            <AutomationEngine />
             {/* Top Bar */}
             <div className="bg-white border-b border-slate-200 px-6 py-4">
                 <div className="flex items-center justify-between">
@@ -143,14 +146,24 @@ export default function AgentsPage() {
                             <p className="text-sm text-slate-500">Manage your AI agents</p>
                         </div>
                     </div>
-                    <Button
-                        onClick={() => window.location.href = '/Workflows'}
-                        variant="outline"
-                        className="hidden md:flex"
-                    >
-                        <WorkflowIcon className="h-4 w-4 mr-2" />
-                        Workflows
-                    </Button>
+                    <div className="flex gap-2">
+                        <Button
+                            onClick={() => setShowCapabilities(!showCapabilities)}
+                            variant="outline"
+                            className="hidden md:flex"
+                        >
+                            <Sparkles className="h-4 w-4 mr-2" />
+                            Automation
+                        </Button>
+                        <Button
+                            onClick={() => window.location.href = '/Workflows'}
+                            variant="outline"
+                            className="hidden md:flex"
+                        >
+                            <WorkflowIcon className="h-4 w-4 mr-2" />
+                            Workflows
+                        </Button>
+                    </div>
                 </div>
             </div>
 
@@ -158,6 +171,11 @@ export default function AgentsPage() {
             {!selectedConversation && (
                 <div className="flex-1 overflow-auto px-6 py-8">
                     <div className="max-w-6xl mx-auto">
+                        {showCapabilities && (
+                            <div className="mb-6">
+                                <AutomationRuleManager agents={agents} />
+                            </div>
+                        )}
                         <h2 className="text-xl font-semibold text-slate-800 mb-6">Select an Agent</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {agents.map((agent) => {
