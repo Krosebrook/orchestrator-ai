@@ -95,11 +95,11 @@ Built with modern web technologies:
 
 See [ROADMAP.md](./ROADMAP.md) for the complete feature roadmap including:
 
-- **Phase 1**: Foundation & Stability (Q1 2026)
-- **Phase 2**: Enhanced Intelligence (Q2 2026)
-- **Phase 3**: Enterprise Readiness (Q3 2026)
-- **Phase 4**: Advanced Capabilities (Q4 2026)
-- **Phase 5**: AI-First Platform (Q1 2027)
+- **Phase 1**: Foundation & Stability (Quarter 1)
+- **Phase 2**: Enhanced Intelligence (Quarter 2)
+- **Phase 3**: Enterprise Readiness (Quarter 3)
+- **Phase 4**: Advanced Capabilities (Quarter 4)
+- **Phase 5**: AI-First Platform (Quarter 5)
 
 ## 🔍 Technical Audit
 
