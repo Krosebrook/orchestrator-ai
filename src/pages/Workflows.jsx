@@ -14,6 +14,8 @@ import TemplateConfigDialog from '../components/workflows/TemplateConfigDialog';
 import AIWorkflowGenerator from '../components/workflows/AIWorkflowGenerator';
 import WorkflowOptimizationAssistant from '../components/workflows/WorkflowOptimizationAssistant';
 import PerformanceAnalysisEngine from '../components/workflows/PerformanceAnalysisEngine';
+import WorkflowApprovalPanel from '../components/workflows/WorkflowApprovalPanel';
+import { executeWorkflow } from '../components/workflows/EnhancedWorkflowExecutor';
 import { toast } from 'sonner';
 
 export default function WorkflowsPage() {
@@ -267,6 +269,10 @@ export default function WorkflowsPage() {
                             <Sparkles className="h-4 w-4 mr-2" />
                             Executions
                         </TabsTrigger>
+                        <TabsTrigger value="approvals">
+                            <Sparkles className="h-4 w-4 mr-2" />
+                            Approvals
+                        </TabsTrigger>
                     </TabsList>
 
                     {/* AI Generator Tab */}
@@ -343,6 +349,11 @@ export default function WorkflowsPage() {
                                 ))}
                             </div>
                         )}
+                    </TabsContent>
+
+                    {/* Approvals Tab */}
+                    <TabsContent value="approvals">
+                        <WorkflowApprovalPanel />
                     </TabsContent>
 
                     {/* Executions Tab */}

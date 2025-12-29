@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Send, FileText } from 'lucide-react';
 import { Textarea } from "@/components/ui/textarea";
 import AgentInteractionTimeline from './AgentInteractionTimeline';
