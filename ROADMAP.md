@@ -41,17 +41,19 @@ Transform the AI Orchestrator Platform into the industry-leading solution for en
 
 ## 🗓️ Roadmap Overview
 
+*Note: Phases are planned relative to the start of implementation. If starting in December 2024, Phase 1 would run Q1 2025, etc.*
+
 ```
-Q1 2026          Q2 2026          Q3 2026          Q4 2026          Q1 2027
-   |                |                |                |                |
 Phase 1         Phase 2         Phase 3         Phase 4         Phase 5
+Quarter 1       Quarter 2       Quarter 3       Quarter 4       Quarter 5
+   |                |                |                |                |
 Foundation      Intelligence    Enterprise      Advanced        AI-First
 & Stability     Enhancement     Readiness       Capabilities    Platform
 ```
 
 ---
 
-## Phase 1: Foundation & Stability (Q1 2026)
+## Phase 1: Foundation & Stability (Quarter 1)
 
 **Theme**: Build a solid foundation for growth  
 **Duration**: 3 months  
@@ -97,7 +99,7 @@ Foundation      Intelligence    Enterprise      Advanced        AI-First
 
 ---
 
-## Phase 2: Enhanced Intelligence (Q2 2026)
+## Phase 2: Enhanced Intelligence (Quarter 2)
 
 **Theme**: AI-powered optimization and collaboration  
 **Duration**: 3 months  
@@ -134,7 +136,7 @@ Foundation      Intelligence    Enterprise      Advanced        AI-First
 
 ---
 
-## Phase 3: Enterprise Readiness (Q3 2026)
+## Phase 3: Enterprise Readiness (Quarter 3)
 
 **Theme**: Security, scalability, and governance  
 **Duration**: 3 months  
@@ -171,7 +173,7 @@ Foundation      Intelligence    Enterprise      Advanced        AI-First
 
 ---
 
-## Phase 4: Advanced Capabilities (Q4 2026)
+## Phase 4: Advanced Capabilities (Quarter 4)
 
 **Theme**: Extensibility and analytics  
 **Duration**: 3 months  
@@ -208,7 +210,7 @@ Foundation      Intelligence    Enterprise      Advanced        AI-First
 
 ---
 
-## Phase 5: AI-First Platform (Q1 2027)
+## Phase 5: AI-First Platform (Quarter 5)
 
 **Theme**: Natural language and autonomous operations  
 **Duration**: 3 months  

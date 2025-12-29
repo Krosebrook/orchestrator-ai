@@ -367,7 +367,7 @@ src/
 
 ## 5. Feature Roadmap
 
-### Phase 1: Foundation & Stability (Q1 2026)
+### Phase 1: Foundation & Stability (Quarter 1)
 **Priority: HIGH | Duration: 3 months**
 
 #### 5.1.1 Testing Infrastructure
@@ -406,7 +406,7 @@ src/
 
 ---
 
-### Phase 2: Enhanced Intelligence (Q2 2026)
+### Phase 2: Enhanced Intelligence (Quarter 2)
 **Priority: HIGH | Duration: 3 months**
 
 #### 5.2.1 Advanced AI Features
@@ -437,7 +437,7 @@ src/
 
 ---
 
-### Phase 3: Enterprise Readiness (Q3 2026)
+### Phase 3: Enterprise Readiness (Quarter 3)
 **Priority: MEDIUM | Duration: 3 months**
 
 #### 5.3.1 Security Enhancements
@@ -469,7 +469,7 @@ src/
 
 ---
 
-### Phase 4: Advanced Capabilities (Q4 2026)
+### Phase 4: Advanced Capabilities (Quarter 4)
 **Priority: MEDIUM | Duration: 3 months**
 
 #### 5.4.1 Marketplace & Extensions
@@ -500,7 +500,7 @@ src/
 
 ---
 
-### Phase 5: AI-First Platform (Q1 2027)
+### Phase 5: AI-First Platform (Quarter 5)
 **Priority: LOW | Duration: 3 months**
 
 #### 5.5.1 Natural Language Interface
