@@ -1,33 +1,35 @@
+import AgentCollaborationHub from './pages/AgentCollaborationHub';
+import AgentPerformance from './pages/AgentPerformance';
+import AgentProfileAdmin from './pages/AgentProfileAdmin';
 import Agents from './pages/Agents';
 import Dashboard from './pages/Dashboard';
-import Integrations from './pages/Integrations';
-import Landing from './pages/Landing';
-import Workflows from './pages/Workflows';
 import Deployments from './pages/Deployments';
 import GettingStarted from './pages/GettingStarted';
+import Integrations from './pages/Integrations';
+import Landing from './pages/Landing';
+import Orchestration from './pages/Orchestration';
 import RoleManagement from './pages/RoleManagement';
 import UserManagement from './pages/UserManagement';
-import AgentPerformance from './pages/AgentPerformance';
-import Orchestration from './pages/Orchestration';
-import AgentProfileAdmin from './pages/AgentProfileAdmin';
-import AgentCollaborationHub from './pages/AgentCollaborationHub';
+import Workflows from './pages/Workflows';
+import TrainingHub from './pages/TrainingHub';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "AgentCollaborationHub": AgentCollaborationHub,
+    "AgentPerformance": AgentPerformance,
+    "AgentProfileAdmin": AgentProfileAdmin,
     "Agents": Agents,
     "Dashboard": Dashboard,
-    "Integrations": Integrations,
-    "Landing": Landing,
-    "Workflows": Workflows,
     "Deployments": Deployments,
     "GettingStarted": GettingStarted,
+    "Integrations": Integrations,
+    "Landing": Landing,
+    "Orchestration": Orchestration,
     "RoleManagement": RoleManagement,
     "UserManagement": UserManagement,
-    "AgentPerformance": AgentPerformance,
-    "Orchestration": Orchestration,
-    "AgentProfileAdmin": AgentProfileAdmin,
-    "AgentCollaborationHub": AgentCollaborationHub,
+    "Workflows": Workflows,
+    "TrainingHub": TrainingHub,
 }
 
 export const pagesConfig = {

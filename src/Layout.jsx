@@ -86,6 +86,10 @@ function LayoutContent({ children, currentPageName }) {
                             <Users className="h-4 w-4" />
                             Collaboration
                         </Link>
+                        <Link to={createPageUrl('TrainingHub')} className={navLinkClass('TrainingHub')}>
+                            <Sparkles className="h-4 w-4" />
+                            Training
+                        </Link>
                         {canAccessResource('admin') && (
                         <>
                             <Link to={createPageUrl('RoleManagement')} className={navLinkClass('RoleManagement')}>
