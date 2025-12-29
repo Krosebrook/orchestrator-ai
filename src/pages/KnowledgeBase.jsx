@@ -9,6 +9,7 @@ import KnowledgeArticleCard from '../components/knowledge/KnowledgeArticleCard';
 import KnowledgeArticleEditor from '../components/knowledge/KnowledgeArticleEditor';
 import KnowledgeGapAnalysis from '../components/knowledge/KnowledgeGapAnalysis';
 import KnowledgeSearch from '../components/knowledge/KnowledgeSearch';
+import AIKnowledgeManager from '../components/knowledge/AIKnowledgeManager';
 
 export default function KnowledgeBasePage() {
     const [articles, setArticles] = useState([]);
@@ -164,7 +165,8 @@ export default function KnowledgeBasePage() {
                         }} />
                     </TabsContent>
 
-                    <TabsContent value="gaps">
+                    <TabsContent value="gaps" className="space-y-6">
+                        <AIKnowledgeManager onArticleGenerated={loadData} />
                         <KnowledgeGapAnalysis queries={queries} articles={articles} onCreateArticle={() => setShowEditor(true)} />
                     </TabsContent>
 

@@ -7,12 +7,12 @@ import Deployments from './pages/Deployments';
 import GettingStarted from './pages/GettingStarted';
 import Integrations from './pages/Integrations';
 import Landing from './pages/Landing';
+import MonitoringDashboard from './pages/MonitoringDashboard';
 import Orchestration from './pages/Orchestration';
 import RoleManagement from './pages/RoleManagement';
+import TrainingHub from './pages/TrainingHub';
 import UserManagement from './pages/UserManagement';
 import Workflows from './pages/Workflows';
-import TrainingHub from './pages/TrainingHub';
-import MonitoringDashboard from './pages/MonitoringDashboard';
 import KnowledgeBase from './pages/KnowledgeBase';
 import __Layout from './Layout.jsx';
 
@@ -27,12 +27,12 @@ export const PAGES = {
     "GettingStarted": GettingStarted,
     "Integrations": Integrations,
     "Landing": Landing,
+    "MonitoringDashboard": MonitoringDashboard,
     "Orchestration": Orchestration,
     "RoleManagement": RoleManagement,
+    "TrainingHub": TrainingHub,
     "UserManagement": UserManagement,
     "Workflows": Workflows,
-    "TrainingHub": TrainingHub,
-    "MonitoringDashboard": MonitoringDashboard,
     "KnowledgeBase": KnowledgeBase,
 }
 
