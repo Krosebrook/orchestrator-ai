@@ -59,6 +59,13 @@ export default function AICoachingSystem({ agentName }) {
             const weaknesses = recentSessions.flatMap(s => s.feedback?.weaknesses || []);
             const strengths = recentSessions.flatMap(s => s.feedback?.strengths || []);
 
+            // Get predictive recommendations for context
+            const futureRecs = await base44.entities.TrainingRecommendation.filter(
+                { agent_name: agentName, recommendation_type: 'new_capability' },
+                '-created_date',
+                5
+            );
+
             const result = await base44.integrations.Core.InvokeLLM({
                 prompt: `Provide personalized coaching for agent: ${agentName}
 
@@ -82,14 +89,17 @@ ${recentSessions.slice(0, 3).map(s =>
     `Session: ${s.module_title}\n  Score: ${s.score}\n  Feedback: ${s.feedback?.overall_assessment || 'N/A'}`
 ).join('\n\n')}
 
-Provide personalized coaching:
+FUTURE SKILL PREDICTIONS:
+${futureRecs.length > 0 ? futureRecs.map(r => `- ${r.title}: ${r.description}`).join('\n') : 'No future predictions available'}
+
+Provide personalized coaching considering both current performance AND future needs:
 1. Overall assessment of progress
-2. Specific skill gaps (ranked by severity)
-3. Personalized improvement strategies
+2. Specific skill gaps (current + predicted future gaps)
+3. Personalized improvement strategies (prioritizing future-critical skills)
 4. Recommended knowledge articles topics
 5. Targeted exercises to practice
-6. Short-term goals (next 2 weeks)
-7. Long-term development plan
+6. Short-term goals (next 2 weeks) - emphasize future-readiness
+7. Long-term development plan (aligned with predicted industry evolution)
 8. Motivational insights`,
                 response_json_schema: {
                     type: "object",

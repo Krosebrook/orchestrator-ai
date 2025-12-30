@@ -37,6 +37,13 @@ export default function AutomatedPerformanceEvaluator({ agents }) {
                     ? (collaborations.filter(c => c.status === 'completed').length / collaborations.length * 100).toFixed(1)
                     : 0;
 
+                // Get future predictions for forward-looking assessment
+                const futureNeeds = await base44.entities.TrainingRecommendation.filter(
+                    { recommendation_type: 'new_capability' },
+                    '-created_date',
+                    10
+                );
+
                 const evaluation = await base44.integrations.Core.InvokeLLM({
                     prompt: `Comprehensive performance evaluation for agent: ${agent.name}
 
@@ -55,14 +62,18 @@ ${tasks.slice(0, 10).map(t =>
 Error Types:
 ${errors.slice(0, 10).map(e => `- ${e.error_type}: ${e.error_message}`).join('\n')}
 
-Provide:
+PREDICTED FUTURE CAPABILITIES NEEDED:
+${futureNeeds.map(n => `- ${n.title}`).join('\n')}
+
+Provide comprehensive evaluation including future-readiness:
 1. Overall performance grade (A-F)
 2. Strengths (specific examples)
 3. Weaknesses (specific examples)
-4. Critical improvement areas
-5. Training recommendations (specific skills to develop)
+4. Critical improvement areas (current + future preparedness)
+5. Training recommendations (both immediate needs AND future capabilities)
 6. Whether immediate intervention is needed
-7. Comparison to expected performance standards`,
+7. Comparison to expected performance standards
+8. Future-readiness assessment (how prepared for predicted challenges)`,
                     response_json_schema: {
                         type: "object",
                         properties: {
@@ -78,10 +89,13 @@ Provide:
                                     properties: {
                                         skill: { type: "string" },
                                         priority: { type: "string" },
-                                        reasoning: { type: "string" }
+                                        reasoning: { type: "string" },
+                                        timeframe: { type: "string" }
                                     }
                                 }
                             },
+                            future_readiness_score: { type: "number" },
+                            future_gaps: { type: "array", items: { type: "string" } },
                             immediate_intervention: { type: "boolean" },
                             summary: { type: "string" }
                         }
@@ -94,21 +108,24 @@ Provide:
                     metrics: { successRate, avgQuality, collaborationScore, errorCount: errors.length }
                 });
 
-                // Create training recommendations
+                // Create training recommendations (both immediate and future-focused)
                 for (const rec of evaluation.training_recommendations || []) {
                     if (rec.priority === 'high' || rec.priority === 'critical') {
+                        const recType = rec.timeframe?.toLowerCase().includes('future') ? 'new_capability' : 'skill_gap';
                         await base44.entities.TrainingRecommendation.create({
                             agent_name: agent.name,
-                            recommendation_type: 'skill_gap',
+                            recommendation_type: recType,
                             priority: rec.priority,
-                            title: `Improve ${rec.skill}`,
-                            description: rec.reasoning,
+                            title: `${recType === 'new_capability' ? 'Prepare for: ' : 'Improve '}${rec.skill}`,
+                            description: `${rec.reasoning}\n\nTimeframe: ${rec.timeframe || 'Immediate'}`,
                             evidence: [{
                                 type: 'performance_evaluation',
                                 description: evaluation.summary,
                                 metric: evaluation.overall_score
                             }],
-                            expected_impact: `Address ${rec.skill} deficiency identified in evaluation`,
+                            expected_impact: recType === 'new_capability' 
+                                ? `Proactively develop ${rec.skill} for future demands`
+                                : `Address ${rec.skill} deficiency identified in evaluation`,
                             status: 'pending'
                         });
                     }
@@ -223,13 +240,37 @@ Provide:
                             <div className="bg-purple-50 border border-purple-200 p-3 rounded mt-3">
                                 <p className="text-xs font-semibold text-purple-900 mb-2">Training Recommendations:</p>
                                 {report.training_recommendations.map((rec, i) => (
-                                    <div key={i} className="mb-1">
-                                        <p className="text-xs text-purple-700 font-medium">
-                                            {rec.skill} ({rec.priority} priority)
-                                        </p>
-                                        <p className="text-xs text-purple-600">{rec.reasoning}</p>
+                                    <div key={i} className="mb-2">
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-xs text-purple-700 font-medium">
+                                                {rec.skill}
+                                            </p>
+                                            <Badge className={rec.timeframe?.toLowerCase().includes('future') ? 'bg-blue-600' : 'bg-orange-600'}>
+                                                {rec.priority} | {rec.timeframe || 'Immediate'}
+                                            </Badge>
+                                        </div>
+                                        <p className="text-xs text-purple-600 mt-1">{rec.reasoning}</p>
                                     </div>
                                 ))}
+                            </div>
+                        )}
+
+                        {report.future_readiness_score !== undefined && (
+                            <div className="bg-blue-50 border border-blue-200 p-3 rounded mt-3">
+                                <div className="flex items-center justify-between mb-2">
+                                    <p className="text-xs font-semibold text-blue-900">Future Readiness:</p>
+                                    <Badge className={report.future_readiness_score >= 70 ? 'bg-green-600' : report.future_readiness_score >= 50 ? 'bg-yellow-600' : 'bg-red-600'}>
+                                        {report.future_readiness_score}/100
+                                    </Badge>
+                                </div>
+                                {report.future_gaps?.length > 0 && (
+                                    <div>
+                                        <p className="text-xs text-blue-700 mb-1">Predicted Gaps:</p>
+                                        {report.future_gaps.map((gap, i) => (
+                                            <p key={i} className="text-xs text-blue-600">• {gap}</p>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         )}
                     </CardContent>
