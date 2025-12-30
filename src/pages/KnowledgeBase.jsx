@@ -98,15 +98,19 @@ export default function KnowledgeBasePage() {
                     </Button>
                 </div>
 
-                <Tabs defaultValue="browse">
+                <Tabs defaultValue="ai-search">
                     <TabsList className="bg-white">
+                        <TabsTrigger value="ai-search">
+                            <Brain className="h-4 w-4 mr-2" />
+                            AI Search
+                        </TabsTrigger>
                         <TabsTrigger value="browse">
                             <BookOpen className="h-4 w-4 mr-2" />
                             Browse
                         </TabsTrigger>
-                        <TabsTrigger value="search">
+                        <TabsTrigger value="questions">
                             <Search className="h-4 w-4 mr-2" />
-                            AI Search
+                            Frequent Questions
                         </TabsTrigger>
                         <TabsTrigger value="gaps">
                             <Brain className="h-4 w-4 mr-2" />
@@ -117,6 +121,15 @@ export default function KnowledgeBasePage() {
                             Trending
                         </TabsTrigger>
                     </TabsList>
+
+                    <TabsContent value="ai-search" className="space-y-6">
+                        <NaturalLanguageKnowledgeSearch 
+                            onArticleSelect={(article) => {
+                                setEditingArticle(article);
+                                setShowEditor(true);
+                            }}
+                        />
+                    </TabsContent>
 
                     <TabsContent value="browse" className="space-y-4">
                         <div className="flex gap-4">
@@ -160,11 +173,13 @@ export default function KnowledgeBasePage() {
                         </div>
                     </TabsContent>
 
-                    <TabsContent value="search">
-                        <KnowledgeSearch articles={articles} onArticleSelect={(a) => {
-                            setEditingArticle(a);
-                            setShowEditor(true);
-                        }} />
+                    <TabsContent value="questions" className="space-y-6">
+                        <FrequentQuestionAnalyzer 
+                            onCreateArticle={(articleData) => {
+                                setEditingArticle(articleData);
+                                setShowEditor(true);
+                            }}
+                        />
                     </TabsContent>
 
                     <TabsContent value="gaps" className="space-y-6">

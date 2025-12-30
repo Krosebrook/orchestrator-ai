@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Loader2, Sparkles } from 'lucide-react';
 import MessageBubble from './MessageBubble';
+import RealtimeArticleSuggester from '../knowledge/RealtimeArticleSuggester';
 import { cn } from "@/lib/utils";
 
 export default function ChatWindow({ conversation, agent }) {
@@ -93,17 +94,27 @@ export default function ChatWindow({ conversation, agent }) {
 
             {/* Messages */}
             <ScrollArea className="flex-1 px-6 py-4">
-                <div className="space-y-4 max-w-4xl mx-auto">
-                    {messages.length === 0 ? (
-                        <div className="text-center py-12">
-                            <p className="text-slate-400">Start a conversation...</p>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+                    <div className="lg:col-span-2 space-y-4">
+                        {messages.length === 0 ? (
+                            <div className="text-center py-12">
+                                <p className="text-slate-400">Start a conversation...</p>
+                            </div>
+                        ) : (
+                            messages.map((message, idx) => (
+                                <MessageBubble key={idx} message={message} />
+                            ))
+                        )}
+                        <div ref={scrollRef} />
+                    </div>
+                    <div className="lg:col-span-1">
+                        <div className="sticky top-4">
+                            <RealtimeArticleSuggester 
+                                conversationId={conversation?.id}
+                                currentMessages={messages}
+                            />
                         </div>
-                    ) : (
-                        messages.map((message, idx) => (
-                            <MessageBubble key={idx} message={message} />
-                        ))
-                    )}
-                    <div ref={scrollRef} />
+                    </div>
                 </div>
             </ScrollArea>
 
