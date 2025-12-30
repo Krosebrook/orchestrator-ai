@@ -10,6 +10,8 @@ import KnowledgeArticleEditor from '../components/knowledge/KnowledgeArticleEdit
 import KnowledgeGapAnalysis from '../components/knowledge/KnowledgeGapAnalysis';
 import KnowledgeSearch from '../components/knowledge/KnowledgeSearch';
 import AIKnowledgeManager from '../components/knowledge/AIKnowledgeManager';
+import NaturalLanguageKnowledgeSearch from '../components/knowledge/NaturalLanguageKnowledgeSearch';
+import FrequentQuestionAnalyzer from '../components/knowledge/FrequentQuestionAnalyzer';
 
 export default function KnowledgeBasePage() {
     const [articles, setArticles] = useState([]);
