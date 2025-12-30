@@ -11,6 +11,7 @@ import ScenarioSimulator from '../components/training/ScenarioSimulator';
 import TrainingRecommendations from '../components/training/TrainingRecommendations';
 import TrainingAnalytics from '../components/training/TrainingAnalytics';
 import AICoachingSystem from '../components/training/AICoachingSystem';
+import PredictiveSkillGapAnalyzer from '../components/training/PredictiveSkillGapAnalyzer';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function TrainingHubPage() {
@@ -162,13 +163,18 @@ export default function TrainingHubPage() {
                     </Card>
                 </div>
 
-                <Tabs defaultValue="modules">
+                <Tabs defaultValue="predictive">
                     <TabsList className="bg-white">
+                        <TabsTrigger value="predictive">Future Skills</TabsTrigger>
                         <TabsTrigger value="modules">Training Modules</TabsTrigger>
                         <TabsTrigger value="coaching">AI Coaching</TabsTrigger>
                         <TabsTrigger value="recommendations">AI Recommendations</TabsTrigger>
                         <TabsTrigger value="analytics">Analytics</TabsTrigger>
                     </TabsList>
+
+                    <TabsContent value="predictive" className="mt-6">
+                        <PredictiveSkillGapAnalyzer agents={agents} />
+                    </TabsContent>
 
                     <TabsContent value="modules" className="mt-6 space-y-6">
                         {modules.length === 0 ? (
