@@ -445,10 +445,10 @@ npm run dev
 ### This Repository:  `Krosebrook/orchestrator-ai`
 
 **Tech Stack**:
-- **Frontend**: React 18.2 + Vite 6.1 + Tailwind CSS 3.4 + Radix UI
+- **Frontend**: React 18.2.0 + Vite 6.1.0 + Tailwind CSS 3.4.17 + Radix UI
 - **Backend SDK**: Base44 SDK 0.8.3
-- **State Management**:  TanStack Query 5.84 + React hooks and context
-- **Routing**: React Router 6.26
+- **State Management**:  TanStack Query 5.84.1 + React hooks and context
+- **Routing**: React Router 6.26.0
 - **Forms**: React Hook Form + Zod validation
 - **UI Components**: shadcn/ui + Radix UI primitives
 

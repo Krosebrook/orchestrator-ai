@@ -22,20 +22,20 @@ This is a comprehensive React-based web application built with modern technologi
 ## 🏗️ Technology Stack
 
 ### Frontend
-- **Framework**: React 18.2
-- **Build Tool**: Vite 6.1
+- **Framework**: React 18.2.0
+- **Build Tool**: Vite 6.1.0
 - **UI Library**: Radix UI + shadcn/ui
-- **Styling**: Tailwind CSS 3.4
-- **State Management**: TanStack Query 5.84 + React Context
+- **Styling**: Tailwind CSS 3.4.17
+- **State Management**: TanStack Query 5.84.1 + React Context
 - **Forms**: React Hook Form + Zod
-- **Routing**: React Router 6.26
+- **Routing**: React Router 6.26.0
 
 ### Backend
 - **SDK**: Base44 SDK 0.8.3 (serverless functions)
 
 ### Development
-- **Linting**: ESLint 9.19
-- **Type Checking**: TypeScript 5.8 (JSDoc mode)
+- **Linting**: ESLint 9.19.0
+- **Type Checking**: TypeScript 5.8.2 (JSDoc mode)
 - **Package Manager**: npm
 
 ---
