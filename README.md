@@ -9,7 +9,11 @@ This repository includes comprehensive documentation:
 - **[PRD.md](./PRD.md)** - Complete Product Requirements Document with feature inventory
 - **[ROADMAP.md](./ROADMAP.md)** - Feature roadmap with phases and timelines  
 - **[TECHNICAL_AUDIT.md](./TECHNICAL_AUDIT.md)** - Detailed technical audit and assessment
-- **[RECOMMENDATIONS.md](./RECOMMENDATIONS.md)** - 🆕 Implementation recommendations, repository integrations, and GitHub agent prompts
+- **[RECOMMENDATIONS.md](./RECOMMENDATIONS.md)** - Implementation recommendations, repository integrations, and GitHub agent prompts
+- **[CHANGELOG.md](./CHANGELOG.md)** - Version history following Keep a Changelog format
+- **[agents.md](./agents.md)** - AI agent architecture, patterns, and decision logic
+- **[claude.md](./claude.md)** - Claude agent configuration and usage
+- **[gemini.md](./gemini.md)** - Gemini agent configuration and usage
 
 ## 🚀 Quick Start
 
