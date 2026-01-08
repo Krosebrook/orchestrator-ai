@@ -45,6 +45,77 @@ npm run preview
 - `npm run lint` - Run ESLint
 - `npm run lint:fix` - Fix ESLint issues
 - `npm run typecheck` - Run TypeScript type checking
+- `npm test` - Run tests in watch mode
+- `npm run test:run` - Run tests once
+- `npm run test:ui` - Run tests with UI
+- `npm run test:coverage` - Run tests with coverage report
+
+## 🧪 Testing
+
+The project uses **Vitest** as the test runner with **React Testing Library** for component testing.
+
+### Running Tests
+
+```bash
+# Run tests in watch mode (for development)
+npm test
+
+# Run tests once (for CI)
+npm run test:run
+
+# Run tests with coverage report
+npm run test:coverage
+
+# Run tests with UI
+npm run test:ui
+```
+
+### Test Structure
+
+Tests are located in `__tests__` directories alongside the components they test:
+
+```
+src/
+  components/
+    ui/
+      __tests__/
+        button.test.jsx
+        card.test.jsx
+        input.test.jsx
+        badge.test.jsx
+      button.jsx
+      card.jsx
+      ...
+```
+
+### Writing Tests
+
+Use the test utilities provided in `src/utils/test-utils.jsx`:
+
+```javascript
+import { renderWithProviders, userEvent } from '@/utils/test-utils';
+import { Button } from '../button';
+
+describe('Button', () => {
+  it('should render correctly', () => {
+    const { getByRole } = renderWithProviders(<Button>Click me</Button>);
+    expect(getByRole('button')).toBeInTheDocument();
+  });
+});
+```
+
+### Coverage
+
+Current coverage for tested components: **100%**
+
+Tested components:
+- Button (UI component)
+- Card (UI component)
+- Input (UI component)
+- Badge (UI component)
+- AlertsPanel (Business logic component)
+
+Run `npm run test:coverage` to see detailed coverage reports.
 
 ## 🏗️ Architecture
 
