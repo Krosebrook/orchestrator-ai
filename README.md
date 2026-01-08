@@ -4,7 +4,22 @@ A comprehensive enterprise application for managing, orchestrating, and optimizi
 
 ## 📚 Documentation
 
-This repository includes comprehensive documentation:
+This repository includes comprehensive documentation organized for both human developers and LLM consumption:
+
+### Core Documentation Index for LLMs
+
+- **[DOC_POLICY.md](./DOC_POLICY.md)** - Documentation governance, versioning, and approval process
+- **[AGENTS_DOCUMENTATION_AUTHORITY.md](./AGENTS_DOCUMENTATION_AUTHORITY.md)** - AI-driven Documentation Authority system architecture
+- **[SECURITY.md](./SECURITY.md)** - Comprehensive security architecture, data handling, and compliance measures
+- **[FRAMEWORK.md](./FRAMEWORK.md)** - Core technologies, libraries, and architectural patterns (React, Tailwind, Base44)
+- **[CHANGELOG_SEMANTIC.md](./CHANGELOG_SEMANTIC.md)** - Semantic versioning approach and release documentation
+- **[API_REFERENCE.md](./API_REFERENCE.md)** - Complete API endpoint reference and interaction guide
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - High-level architectural overview of the entire system
+- **[ENTITY_ACCESS_RULES.md](./ENTITY_ACCESS_RULES.md)** - Detailed RBAC rules for each database entity
+- **[GITHUB_SETUP_INSTRUCTIONS.md](./GITHUB_SETUP_INSTRUCTIONS.md)** - Step-by-step GitHub repository and CI/CD setup
+- **[PRD_MASTER.md](./PRD_MASTER.md)** - Overarching Product Requirements Document for the platform
+
+### Additional Documentation
 
 - **[PRD.md](./PRD.md)** - Complete Product Requirements Document with feature inventory
 - **[ROADMAP.md](./ROADMAP.md)** - Feature roadmap with phases and timelines  
