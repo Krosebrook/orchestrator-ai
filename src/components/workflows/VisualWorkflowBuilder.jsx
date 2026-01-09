@@ -8,16 +8,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { 
     Bot, GitBranch, GitMerge, UserCheck, Flag, Plus, Trash2, 
-    Save, Settings, ArrowRight, Zap, X
+    Save, Settings, ArrowRight, Zap, X, RefreshCw
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
 import ActionConfigDialog from './ActionConfigDialog';
 import ConditionalLogicEditor from './ConditionalLogicEditor';
+import LoopConfigEditor from './LoopConfigEditor';
 
 const NODE_TYPES = [
     { id: 'agent', name: 'Agent Task', icon: Bot, color: 'from-blue-500 to-cyan-500' },
     { id: 'condition', name: 'Conditional Branch', icon: GitBranch, color: 'from-yellow-500 to-orange-500' },
     { id: 'parallel', name: 'Parallel Execution', icon: GitMerge, color: 'from-purple-500 to-pink-500' },
+    { id: 'loop', name: 'Loop', icon: Zap, color: 'from-indigo-500 to-purple-500' },
     { id: 'approval', name: 'Human Approval', icon: UserCheck, color: 'from-green-500 to-emerald-500' },
     { id: 'end', name: 'End', icon: Flag, color: 'from-red-500 to-rose-500' }
 ];
@@ -31,10 +34,12 @@ export default function VisualWorkflowBuilder({ workflow, agents, onSave, onCanc
     const [selectedNode, setSelectedNode] = useState(null);
     const [showActionDialog, setShowActionDialog] = useState(false);
     const [showConditionDialog, setShowConditionDialog] = useState(false);
+    const [showLoopDialog, setShowLoopDialog] = useState(false);
     const [errorHandling, setErrorHandling] = useState(workflow?.error_handling || {
         max_retries: 3,
         retry_delay: 5,
-        fallback_strategy: 'stop'
+        fallback_strategy: 'stop',
+        notification_emails: []
     });
 
     const addNode = (type) => {
@@ -51,11 +56,28 @@ export default function VisualWorkflowBuilder({ workflow, agents, onSave, onCanc
     const getDefaultConfig = (type) => {
         switch (type) {
             case 'agent':
-                return { agent_name: '', instructions: '', max_retries: 3 };
+                return { 
+                    agent_name: '', 
+                    instructions: '', 
+                    max_retries: 3,
+                    retry_strategy: 'exponential_backoff',
+                    timeout_seconds: 300,
+                    dynamic_selection: false,
+                    selection_criteria: {},
+                    fallback_agents: []
+                };
             case 'condition':
-                return { condition_prompt: '', true_label: 'Yes', false_label: 'No' };
+                return { condition_prompt: '', true_label: 'Yes', false_label: 'No', conditions: [] };
             case 'parallel':
                 return { branches: [] };
+            case 'loop':
+                return { 
+                    loop_config: {
+                        loop_type: 'foreach',
+                        max_iterations: 100,
+                        break_on_error: true
+                    }
+                };
             case 'approval':
                 return { approvers: [], message: '', timeout_hours: 24 };
             case 'end':
@@ -180,26 +202,42 @@ export default function VisualWorkflowBuilder({ workflow, agents, onSave, onCanc
 
                 {node.type === 'agent' && (
                     <>
-                        <div>
-                            <Label>Agent</Label>
-                            <Select
-                                value={node.config.agent_name}
-                                onValueChange={(value) => updateNode(node.id, {
-                                    config: { ...node.config, agent_name: value }
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <Label>Dynamic Agent Selection</Label>
+                                <p className="text-xs text-slate-500">Select agent based on task requirements</p>
+                            </div>
+                            <Switch
+                                checked={node.config.dynamic_selection || false}
+                                onCheckedChange={(checked) => updateNode(node.id, {
+                                    config: { ...node.config, dynamic_selection: checked }
                                 })}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select agent" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {agents.map(agent => (
-                                        <SelectItem key={agent.name} value={agent.name}>
-                                            {agent.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            />
                         </div>
+                        
+                        {!node.config.dynamic_selection && (
+                            <div>
+                                <Label>Agent</Label>
+                                <Select
+                                    value={node.config.agent_name}
+                                    onValueChange={(value) => updateNode(node.id, {
+                                        config: { ...node.config, agent_name: value }
+                                    })}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select agent" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {agents.map(agent => (
+                                            <SelectItem key={agent.name} value={agent.name}>
+                                                {agent.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
+                        
                         <div>
                             <Label>Instructions</Label>
                             <Textarea
@@ -210,6 +248,49 @@ export default function VisualWorkflowBuilder({ workflow, agents, onSave, onCanc
                                 rows={3}
                             />
                         </div>
+                        
+                        <div>
+                            <Label>Retry Strategy</Label>
+                            <Select
+                                value={node.config.retry_strategy || 'exponential_backoff'}
+                                onValueChange={(value) => updateNode(node.id, {
+                                    config: { ...node.config, retry_strategy: value }
+                                })}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="exponential_backoff">Exponential Backoff</SelectItem>
+                                    <SelectItem value="fixed_delay">Fixed Delay</SelectItem>
+                                    <SelectItem value="immediate">Immediate</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <Label>Max Retries</Label>
+                                <Input
+                                    type="number"
+                                    value={node.config.max_retries || 3}
+                                    onChange={(e) => updateNode(node.id, {
+                                        config: { ...node.config, max_retries: parseInt(e.target.value) }
+                                    })}
+                                />
+                            </div>
+                            <div>
+                                <Label>Timeout (sec)</Label>
+                                <Input
+                                    type="number"
+                                    value={node.config.timeout_seconds || 300}
+                                    onChange={(e) => updateNode(node.id, {
+                                        config: { ...node.config, timeout_seconds: parseInt(e.target.value) }
+                                    })}
+                                />
+                            </div>
+                        </div>
+                        
                         <div>
                             <Button
                                 variant="outline"
@@ -222,16 +303,6 @@ export default function VisualWorkflowBuilder({ workflow, agents, onSave, onCanc
                                 <Zap className="h-4 w-4 mr-2" />
                                 Configure Actions ({node.config.actions?.length || 0})
                             </Button>
-                        </div>
-                        <div>
-                            <Label>Max Retries</Label>
-                            <Input
-                                type="number"
-                                value={node.config.max_retries || 3}
-                                onChange={(e) => updateNode(node.id, {
-                                    config: { ...node.config, max_retries: parseInt(e.target.value) }
-                                })}
-                            />
                         </div>
                     </>
                 )}
@@ -259,6 +330,30 @@ export default function VisualWorkflowBuilder({ workflow, agents, onSave, onCanc
                                         {cond.field} {cond.operator} {cond.value}
                                     </p>
                                 ))}
+                            </div>
+                        )}
+                    </>
+                )}
+
+                {node.type === 'loop' && (
+                    <>
+                        <div>
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setSelectedNode(node);
+                                    setShowLoopDialog(true);
+                                }}
+                                className="w-full"
+                            >
+                                <RefreshCw className="h-4 w-4 mr-2" />
+                                Configure Loop
+                            </Button>
+                        </div>
+                        {node.config.loop_config && (
+                            <div className="text-xs bg-indigo-50 p-3 rounded">
+                                <p className="font-semibold text-indigo-700">Loop Type: {node.config.loop_config.loop_type}</p>
+                                <p className="text-indigo-600">Max Iterations: {node.config.loop_config.max_iterations}</p>
                             </div>
                         )}
                     </>
@@ -511,6 +606,17 @@ export default function VisualWorkflowBuilder({ workflow, agents, onSave, onCanc
                 onSave={(updatedNode) => {
                     setNodes(nodes.map(n => n.id === updatedNode.id ? updatedNode : n));
                     setShowConditionDialog(false);
+                }}
+            />
+
+            {/* Loop Config Editor */}
+            <LoopConfigEditor
+                open={showLoopDialog}
+                onClose={() => setShowLoopDialog(false)}
+                node={selectedNode}
+                onSave={(updatedNode) => {
+                    setNodes(nodes.map(n => n.id === updatedNode.id ? updatedNode : n));
+                    setShowLoopDialog(false);
                 }}
             />
         </div>
