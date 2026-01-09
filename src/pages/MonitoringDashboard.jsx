@@ -2,12 +2,16 @@ import { useState, useEffect } from 'react';
 import { base44 } from "@/api/base44Client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, AlertTriangle, TrendingUp, Zap } from 'lucide-react';
+import { Activity, AlertTriangle, TrendingUp, Zap, Workflow, Bot } from 'lucide-react';
 import { toast } from 'sonner';
 import RealTimeMetrics from '../components/monitoring/RealTimeMetrics';
 import AnomalyDetector from '../components/monitoring/AnomalyDetector';
 import PredictiveInsights from '../components/monitoring/PredictiveInsights';
 import AlertsPanel from '../components/monitoring/AlertsPanel';
+import WorkflowExecutionMonitor from '../components/monitoring/WorkflowExecutionMonitor';
+import AgentHealthMonitor from '../components/monitoring/AgentHealthMonitor';
+import BottleneckAnalyzer from '../components/monitoring/BottleneckAnalyzer';
+import CriticalAlertSystem from '../components/monitoring/CriticalAlertSystem';
 
 export default function MonitoringDashboardPage() {
     const [agents, setAgents] = useState([]);
@@ -153,8 +157,20 @@ export default function MonitoringDashboardPage() {
                     </Card>
                 </div>
 
-                <Tabs defaultValue="metrics">
+                <Tabs defaultValue="overview">
                     <TabsList className="bg-white">
+                        <TabsTrigger value="overview">
+                            <Activity className="h-4 w-4 mr-2" />
+                            Overview
+                        </TabsTrigger>
+                        <TabsTrigger value="workflows">
+                            <Workflow className="h-4 w-4 mr-2" />
+                            Workflows
+                        </TabsTrigger>
+                        <TabsTrigger value="agents">
+                            <Bot className="h-4 w-4 mr-2" />
+                            Agents
+                        </TabsTrigger>
                         <TabsTrigger value="metrics">
                             <TrendingUp className="h-4 w-4 mr-2" />
                             Real-Time Metrics
@@ -172,6 +188,27 @@ export default function MonitoringDashboardPage() {
                             Alerts ({alerts.length})
                         </TabsTrigger>
                     </TabsList>
+
+                    <TabsContent value="overview" className="mt-6 space-y-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <CriticalAlertSystem />
+                            <BottleneckAnalyzer />
+                        </div>
+                        <RealTimeMetrics 
+                            agents={agents}
+                            workflows={workflows}
+                            metrics={metrics}
+                            executions={executions}
+                        />
+                    </TabsContent>
+
+                    <TabsContent value="workflows" className="mt-6">
+                        <WorkflowExecutionMonitor />
+                    </TabsContent>
+
+                    <TabsContent value="agents" className="mt-6">
+                        <AgentHealthMonitor />
+                    </TabsContent>
 
                     <TabsContent value="metrics" className="mt-6">
                         <RealTimeMetrics 
