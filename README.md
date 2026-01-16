@@ -2,6 +2,10 @@
 
 A comprehensive enterprise application for managing, orchestrating, and optimizing AI agents and workflows at scale.
 
+**Version**: 1.1  
+**Last Updated**: January 16, 2026  
+**Status**: Active Development
+
 ## 📚 Documentation
 
 This repository includes comprehensive documentation organized for both human developers and LLM consumption:
@@ -35,11 +39,15 @@ This repository includes comprehensive documentation organized for both human de
 ### Prerequisites
 
 - Node.js 18+ 
-- npm or pnpm
+- npm (comes with Node.js)
 
 ### Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/Krosebrook/orchestrator-ai.git
+cd orchestrator-ai
+
 # Install dependencies
 npm install
 
@@ -181,6 +189,8 @@ Built with modern web technologies:
 - **Components**: 157
 - **Lines of Code**: ~29,000
 - **Entity Types**: 41
+- **Test Coverage**: 100% (5 components tested, 137 tests)
+- **Code Quality**: All linting checks passing
 
 ## 🗺️ Roadmap
 
