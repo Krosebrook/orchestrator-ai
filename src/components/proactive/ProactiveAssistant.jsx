@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Lightbulb, AlertTriangle, CheckCircle, XCircle, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Lightbulb, AlertTriangle, CheckCircle, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function ProactiveAssistant() {

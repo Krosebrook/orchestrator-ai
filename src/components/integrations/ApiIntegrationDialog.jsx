@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Code, Settings, ArrowRightLeft, Play } from 'lucide-react';
+import { Code, Settings, ArrowRightLeft } from 'lucide-react';
 import ApiEndpointBrowser from './ApiEndpointBrowser';
 import ApiParameterMapper from './ApiParameterMapper';
 import ApiResponseParser from './ApiResponseParser';

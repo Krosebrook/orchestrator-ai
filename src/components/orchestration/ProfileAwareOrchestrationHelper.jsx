@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { base44 } from "@/api/base44Client";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lightbulb, AlertTriangle, CheckCircle } from 'lucide-react';
 

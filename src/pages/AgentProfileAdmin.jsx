@@ -10,7 +10,6 @@ import TaskPerformanceBreakdownView from '../components/agents/TaskPerformanceBr
 import AISkillGapAnalysis from '../components/agents/AISkillGapAnalysis';
 import AILearningPathGenerator from '../components/agents/AILearningPathGenerator';
 import AIFeedbackSynthesizer from '../components/agents/AIFeedbackSynthesizer';
-import { Badge } from "@/components/ui/badge";
 
 export default function AgentProfileAdminPage() {
     const [agents, setAgents] = useState([]);

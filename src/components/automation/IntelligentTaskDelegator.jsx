@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { base44 } from "@/api/base44Client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Brain, Users, TrendingUp, Clock } from 'lucide-react';
+import { Brain, Users } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function IntelligentTaskDelegator({ agents }) {

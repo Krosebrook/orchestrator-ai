@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { base44 } from "@/api/base44Client";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Loader2, TrendingDown, AlertCircle } from 'lucide-react';
+import { Sparkles, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function PredictiveInsights({ agents, workflows, metrics, executions, onPredictionGenerated }) {

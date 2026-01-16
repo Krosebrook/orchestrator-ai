@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, ExternalLink, Zap } from 'lucide-react';
+import { Search, Zap } from 'lucide-react';
 
 const SERVICE_CATALOG = [
     {

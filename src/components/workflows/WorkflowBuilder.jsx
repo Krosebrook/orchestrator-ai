@@ -6,7 +6,6 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Plus, X, ArrowRight, Save, Sparkles } from 'lucide-react';
-import { cn } from "@/lib/utils";
 
 export default function WorkflowBuilder({ workflow, agents, onSave, onCancel }) {
     const [name, setName] = useState(workflow?.name || '');

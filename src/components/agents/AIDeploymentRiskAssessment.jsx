@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { AlertTriangle, CheckCircle, Loader2, TrendingUp, Activity } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Loader2, Activity } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function AIDeploymentRiskAssessment({ version, agentName, onAssessmentComplete }) {

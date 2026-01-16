@@ -1,6 +1,6 @@
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Activity, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Clock, CheckCircle, XCircle } from 'lucide-react';
 
 export default function RealTimeMetricsChart({ metrics, type = 'response_time' }) {
     // Process metrics for visualization

@@ -1,6 +1,6 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, Target, Activity, CheckCircle } from 'lucide-react';
+import { Users, Target, Activity } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function CollaborationSessionCard({ session, onClick }) {

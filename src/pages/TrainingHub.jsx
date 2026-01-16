@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { GraduationCap, Plus, BookOpen, Target, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import TrainingModuleCreator from '../components/training/TrainingModuleCreator';

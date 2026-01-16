@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { base44 } from "@/api/base44Client";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
     Plug, 
     CheckCircle, 
-    XCircle, 
     Settings, 
     Plus, 
     Search,
@@ -22,7 +21,6 @@ import {
     Sparkles
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { cn } from "@/lib/utils";
 import ConnectionDialog from '../components/integrations/ConnectionDialog';
 import ServiceCatalog from '../components/integrations/ServiceCatalog';
 import SyncConfigurationDialog from '../components/integrations/SyncConfigurationDialog';

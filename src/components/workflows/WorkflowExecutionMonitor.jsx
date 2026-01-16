@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CheckCircle, XCircle, Clock, Loader2, Play, Pause, AlertCircle, ChevronRight } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, Loader2, ChevronRight } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from 'date-fns';
 

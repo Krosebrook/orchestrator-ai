@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { base44 } from "@/api/base44Client";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Search, Zap, Code, ChevronRight } from 'lucide-react';
+import { Search, Code, ChevronRight } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 const METHOD_COLORS = {

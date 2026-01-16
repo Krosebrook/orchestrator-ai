@@ -3,8 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sparkles, BookOpen, ExternalLink } from 'lucide-react';
-import { toast } from 'sonner';
+import { Sparkles, BookOpen } from 'lucide-react';
 
 export default function RealtimeArticleSuggester({ conversationId, currentMessages }) {
     const [suggestions, setSuggestions] = useState([]);

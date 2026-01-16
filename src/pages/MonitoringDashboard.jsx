@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { base44 } from "@/api/base44Client";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Activity, AlertTriangle, TrendingUp, Zap, Workflow, Bot } from 'lucide-react';
 import { toast } from 'sonner';
