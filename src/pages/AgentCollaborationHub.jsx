@@ -6,7 +6,7 @@ import CollaborationWorkspace from '../components/collaboration/CollaborationWor
 import NewCollaborationDialog from '../components/collaboration/NewCollaborationDialog';
 import CollaborationStats from '../components/collaboration/CollaborationStats';
 import SessionsList from '../components/collaboration/SessionsList';
-import { useCollaborationData } from '../components/collaboration/useCollaborationData';
+import { useCollaborationData } from '../components/collaboration/useCollaborationData.jsx';
 
 export default function AgentCollaborationHubPage() {
     // Custom hook handles all data fetching and state management
