@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { base44 } from "@/api/base44Client";
-import { toast } from 'sonner';
 
 export function useAutomationEngine() {
     useEffect(() => {

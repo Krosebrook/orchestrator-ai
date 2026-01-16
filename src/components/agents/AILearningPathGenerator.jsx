@@ -3,7 +3,6 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { BookOpen, CheckCircle, Target, Loader2, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 

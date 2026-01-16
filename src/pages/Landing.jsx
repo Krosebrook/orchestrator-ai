@@ -2,21 +2,16 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { 
     Sparkles, 
     Workflow, 
-    Zap, 
     Brain, 
     CheckCircle, 
     ArrowRight, 
     Users, 
     TrendingUp,
     Shield,
-    Clock,
-    Target,
     BarChart3,
-    MessageSquare,
     Play
 } from 'lucide-react';
 import { createPageUrl } from '@/utils';

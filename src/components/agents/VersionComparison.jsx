@@ -3,7 +3,6 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { GitCompare, Plus, Minus, Edit, ArrowRight } from 'lucide-react';
-import { cn } from "@/lib/utils";
 
 export default function VersionComparison({ version1, version2 }) {
     const [differences, setDifferences] = useState(null);

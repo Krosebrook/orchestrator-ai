@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 import KnowledgeArticleCard from '../components/knowledge/KnowledgeArticleCard';
 import KnowledgeArticleEditor from '../components/knowledge/KnowledgeArticleEditor';
 import KnowledgeGapAnalysis from '../components/knowledge/KnowledgeGapAnalysis';
-import KnowledgeSearch from '../components/knowledge/KnowledgeSearch';
 import AIKnowledgeManager from '../components/knowledge/AIKnowledgeManager';
 import NaturalLanguageKnowledgeSearch from '../components/knowledge/NaturalLanguageKnowledgeSearch';
 import FrequentQuestionAnalyzer from '../components/knowledge/FrequentQuestionAnalyzer';

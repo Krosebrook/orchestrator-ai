@@ -3,10 +3,8 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sparkles, Send, Loader2, TrendingUp, Calendar, DollarSign, Users, BarChart3, RefreshCw, Target, FileText, AlertCircle, CheckCircle, ShoppingCart, MessageSquare, Zap } from 'lucide-react';
-import { cn } from "@/lib/utils";
 import { toast } from 'sonner';
 import MessageBubble from '../agents/MessageBubble';
 

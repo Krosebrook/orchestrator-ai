@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { 
     BookOpen, Video, FileText, Sparkles, Bot, Workflow, 
-    Database, Zap, CheckCircle, PlayCircle, Clock, ArrowRight 
+    Database, Zap, PlayCircle, Clock, ArrowRight 
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import OnboardingTutorial from '../components/onboarding/OnboardingTutorial';

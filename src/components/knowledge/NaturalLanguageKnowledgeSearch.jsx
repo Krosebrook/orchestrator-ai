@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Search, Sparkles, BookOpen, ThumbsUp, ExternalLink } from 'lucide-react';
+import { Search, Sparkles, BookOpen, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function NaturalLanguageKnowledgeSearch({ onArticleSelect }) {

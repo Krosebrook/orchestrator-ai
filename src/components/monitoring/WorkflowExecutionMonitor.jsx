@@ -3,8 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, CheckCircle2, XCircle, Clock, Pause, AlertTriangle } from 'lucide-react';
-import { cn } from "@/lib/utils";
+import { Loader2, CheckCircle2, XCircle, Clock, Pause } from 'lucide-react';
 
 export default function WorkflowExecutionMonitor() {
     const [executions, setExecutions] = useState([]);

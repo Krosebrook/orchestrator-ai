@@ -4,7 +4,6 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle2, Circle, Loader2, AlertCircle, ArrowRight, Sparkles, Play, Pause, RotateCcw, FileText, XCircle, RefreshCw } from 'lucide-react';
 import { cn } from "@/lib/utils";

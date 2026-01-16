@@ -6,7 +6,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Search, Sparkles, Workflow as WorkflowIcon } from 'lucide-react';
 import WorkflowCard from '../components/workflows/WorkflowCard';
-import WorkflowBuilder from '../components/workflows/WorkflowBuilder';
 import VisualWorkflowBuilder from '../components/workflows/VisualWorkflowBuilder';
 import WorkflowExecutionView from '../components/workflows/WorkflowExecutionView';
 import WorkflowTemplates from '../components/workflows/WorkflowTemplates';
@@ -15,7 +14,6 @@ import AIWorkflowGenerator from '../components/workflows/AIWorkflowGenerator';
 import WorkflowOptimizationAssistant from '../components/workflows/WorkflowOptimizationAssistant';
 import PerformanceAnalysisEngine from '../components/workflows/PerformanceAnalysisEngine';
 import WorkflowApprovalPanel from '../components/workflows/WorkflowApprovalPanel';
-import { executeWorkflow } from '../components/workflows/EnhancedWorkflowExecutor';
 import { toast } from 'sonner';
 
 export default function WorkflowsPage() {

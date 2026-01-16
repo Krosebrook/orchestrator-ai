@@ -2,13 +2,10 @@ import { useState, useEffect } from 'react';
 import { base44 } from "@/api/base44Client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-    Rocket, GitBranch, Clock, CheckCircle2, XCircle, AlertCircle,
-    ArrowRight, RotateCcw, Activity, Code, Settings
+    Rocket, GitBranch, CheckCircle2, XCircle,
+    ArrowRight, Activity
 } from 'lucide-react';
-import { cn } from "@/lib/utils";
 import { toast } from 'sonner';
 import EnvironmentCard from '../components/deployments/EnvironmentCard';
 import DeploymentHistory from '../components/deployments/DeploymentHistory';

@@ -2,7 +2,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendingUp, Target, Users, Zap, Star, AlertCircle, Activity } from 'lucide-react';
+import { TrendingUp, Target, Users, Zap, Star, AlertCircle } from 'lucide-react';
 import AgentErrorLogViewer from './AgentErrorLogViewer';
 import TaskPerformanceBreakdownView from './TaskPerformanceBreakdownView';
 import AgentSelfReportManager from './AgentSelfReportManager';

@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { base44 } from "@/api/base44Client";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, TrendingDown, AlertCircle, Clock } from 'lucide-react';
+import { AlertTriangle, AlertCircle } from 'lucide-react';
 
 export default function PredictiveAlerts({ orchestrations, metrics, thresholds }) {
     const [alerts, setAlerts] = useState([]);

@@ -1,6 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown, CheckCircle, XCircle, Clock, Star } from 'lucide-react';
+import { TrendingUp, TrendingDown, CheckCircle, Clock, Star } from 'lucide-react';
 
 export default function PerformanceOverview({ metrics }) {
     const taskMetrics = metrics.filter(m => m.metric_type === 'task_completion');
