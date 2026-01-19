@@ -15,6 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import ActionConfigDialog from './ActionConfigDialog';
 import ConditionalLogicEditor from './ConditionalLogicEditor';
 import LoopConfigEditor from './LoopConfigEditor';
+import WorkflowAIAssistant from './WorkflowAIAssistant';
 
 const NODE_TYPES = [
     { id: 'agent', name: 'Agent Task', icon: Bot, color: 'from-blue-500 to-cyan-500' },
@@ -130,6 +131,28 @@ export default function VisualWorkflowBuilder({ workflow, agents, onSave, onCanc
             error_handling: errorHandling,
             status: workflow?.status || 'draft'
         });
+    };
+
+    const handleAISuggestion = (suggestion) => {
+        const { suggestion_type, action } = suggestion;
+        
+        switch (suggestion_type) {
+            case 'add_node':
+                if (action.node) {
+                    setNodes([...nodes, { ...action.node, id: `node-${Date.now()}` }]);
+                }
+                break;
+            case 'modify_node':
+                if (action.node_id && action.updates) {
+                    updateNode(action.node_id, action.updates);
+                }
+                break;
+            case 'add_connection':
+                if (action.source && action.target) {
+                    addEdge(action.source, action.target, action.condition);
+                }
+                break;
+        }
     };
 
     const NodeCard = ({ node }) => {
@@ -618,6 +641,13 @@ export default function VisualWorkflowBuilder({ workflow, agents, onSave, onCanc
                     setNodes(nodes.map(n => n.id === updatedNode.id ? updatedNode : n));
                     setShowLoopDialog(false);
                 }}
+            />
+
+            {/* AI Assistant */}
+            <WorkflowAIAssistant
+                currentWorkflow={{ name, description, category, nodes, edges }}
+                agents={agents}
+                onApplySuggestion={handleAISuggestion}
             />
         </div>
     );

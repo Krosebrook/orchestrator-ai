@@ -34,15 +34,24 @@ Generate a workflow that achieves this goal. Return a JSON workflow structure wi
 1. name: Clear workflow name
 2. description: What this workflow does
 3. nodes: Array of workflow nodes with:
+   - id: unique identifier (e.g., "node-1", "node-2")
+   - type: "agent", "condition", "parallel", "loop", "approval", or "end"
+   - label: descriptive node name
+   - position: {x: number, y: number} (arrange vertically, y spacing 150px, x centered at 250)
+   - config: 
+     * For agent nodes: { agent_name, instructions, max_retries: 3, timeout_seconds: 300, dynamic_selection: false }
+     * For condition nodes: { conditions: [], true_label: "Yes", false_label: "No" }
+     * For loop nodes: { loop_config: { loop_type: "foreach", max_iterations: 100 } }
+     * For approval nodes: { message, timeout_hours: 24 }
+4. edges: Array of connections with:
    - id: unique identifier
-   - type: "agent", "condition", "parallel", or "approval"
-   - label: node name
-   - position: {x: number, y: number} (arrange vertically, spacing 150px)
-   - config: agent_name (for agent nodes), condition (for condition nodes)
-4. edges: Array of connections with source and target node IDs
+   - source: source node id
+   - target: target node id
+   - condition: (optional) "true" or "false" for conditional branches
 5. category: "research", "content_creation", "data_analysis", "task_automation", or "custom"
+6. tags: Array of relevant tags
 
-Make the workflow practical, efficient, and use the most appropriate agents.`,
+Make the workflow practical, efficient, with proper error handling and use the most appropriate agents.`,
                 response_json_schema: {
                     type: "object",
                     properties: {
@@ -72,7 +81,11 @@ Make the workflow practical, efficient, and use the most appropriate agents.`,
                                 }
                             }
                         },
-                        category: { type: "string" }
+                        category: { type: "string" },
+                        tags: {
+                            type: "array",
+                            items: { type: "string" }
+                        }
                     }
                 }
             });
