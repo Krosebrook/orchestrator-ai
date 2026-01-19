@@ -14,6 +14,7 @@ import RoleManagement from './pages/RoleManagement';
 import TrainingHub from './pages/TrainingHub';
 import UserManagement from './pages/UserManagement';
 import Workflows from './pages/Workflows';
+import AgentSkillsManagement from './pages/AgentSkillsManagement';
 import __Layout from './Layout.jsx';
 
 
@@ -34,6 +35,7 @@ export const PAGES = {
     "TrainingHub": TrainingHub,
     "UserManagement": UserManagement,
     "Workflows": Workflows,
+    "AgentSkillsManagement": AgentSkillsManagement,
 }
 
 export const pagesConfig = {
