@@ -15,6 +15,8 @@ import TrainingHub from './pages/TrainingHub';
 import UserManagement from './pages/UserManagement';
 import Workflows from './pages/Workflows';
 import AgentSkillsManagement from './pages/AgentSkillsManagement';
+import WorkflowCICD from './pages/WorkflowCICD';
+import RealTimeAgentMonitor from './pages/RealTimeAgentMonitor';
 import __Layout from './Layout.jsx';
 
 
@@ -36,6 +38,8 @@ export const PAGES = {
     "UserManagement": UserManagement,
     "Workflows": Workflows,
     "AgentSkillsManagement": AgentSkillsManagement,
+    "WorkflowCICD": WorkflowCICD,
+    "RealTimeAgentMonitor": RealTimeAgentMonitor,
 }
 
 export const pagesConfig = {

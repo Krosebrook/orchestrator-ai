@@ -104,6 +104,18 @@ function LayoutContent({ children, currentPageName }) {
                         </Link>
                         {canAccessResource('admin') && (
                         <>
+                            <Link to={createPageUrl('WorkflowCICD')} className={navLinkClass('WorkflowCICD')}>
+                                <Rocket className="h-4 w-4" />
+                                CI/CD
+                            </Link>
+                            <Link to={createPageUrl('RealTimeAgentMonitor')} className={navLinkClass('RealTimeAgentMonitor')}>
+                                <Activity className="h-4 w-4" />
+                                Monitor
+                            </Link>
+                        </>
+                        )}
+                        {canAccessResource('admin') && (
+                        <>
                             <Link to={createPageUrl('RoleManagement')} className={navLinkClass('RoleManagement')}>
                                 <Shield className="h-4 w-4" />
                                 Roles
