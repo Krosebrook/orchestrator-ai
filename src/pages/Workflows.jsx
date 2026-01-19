@@ -14,6 +14,7 @@ import AIWorkflowGenerator from '../components/workflows/AIWorkflowGenerator';
 import WorkflowOptimizationAssistant from '../components/workflows/WorkflowOptimizationAssistant';
 import PerformanceAnalysisEngine from '../components/workflows/PerformanceAnalysisEngine';
 import WorkflowApprovalPanel from '../components/workflows/WorkflowApprovalPanel';
+import WorkflowOptimizationEngine from '../components/workflows/WorkflowOptimizationEngine';
 import { toast } from 'sonner';
 
 export default function WorkflowsPage() {
@@ -275,13 +276,27 @@ export default function WorkflowsPage() {
 
                     {/* AI Generator Tab */}
                     <TabsContent value="ai-generator" className="space-y-6">
-                        <AIWorkflowGenerator
-                            agents={agents}
-                            onWorkflowGenerated={async (workflow) => {
-                                await handleSaveWorkflow(workflow);
-                                toast.success('AI-generated workflow saved!');
-                            }}
-                        />
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div className="lg:col-span-2 space-y-6">
+                                <AIWorkflowGenerator
+                                    agents={agents}
+                                    onWorkflowGenerated={async (workflow) => {
+                                        await handleSaveWorkflow(workflow);
+                                        toast.success('AI-generated workflow saved!');
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                {filteredWorkflows.length > 0 && (
+                                    <WorkflowOptimizationEngine
+                                        workflow={filteredWorkflows[0]}
+                                        onApplyOptimization={(opt) => {
+                                            toast.info(`Optimization: ${opt.title}`);
+                                        }}
+                                    />
+                                )}
+                            </div>
+                        </div>
                     </TabsContent>
 
                     {/* Templates Tab */}
