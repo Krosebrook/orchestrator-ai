@@ -28,6 +28,7 @@ export default function WorkflowsPage() {
     const [currentExecution, setCurrentExecution] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedTemplate, setSelectedTemplate] = useState(null);
+    const [showTemplateCustomizer, setShowTemplateCustomizer] = useState(false);
 
     useEffect(() => {
         loadData();
