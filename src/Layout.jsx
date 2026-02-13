@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { useState } from 'react';
 import { LayoutDashboard, Bot, Workflow, Home, Plug, Rocket, BookOpen, Shield, BarChart3, GitMerge, Users, Sparkles, Activity, Settings, Brain } from 'lucide-react';
 import { PermissionsProvider, usePermissions } from './components/rbac/PermissionCheck';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import LiveActivityRail from './components/shared/LiveActivityRail';
 
 function LayoutContent({ children, currentPageName }) {
     const { canAccessResource, loading } = usePermissions();
+    const [showActivityRail, setShowActivityRail] = useState(true);
     
     const navLinkClass = (pageName) => {
         const isActive = currentPageName === pageName;
@@ -27,7 +30,9 @@ function LayoutContent({ children, currentPageName }) {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-white">
+            {showActivityRail && <LiveActivityRail />}
+
             {/* Navigation */}
             <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-6 py-4">

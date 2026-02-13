@@ -11,6 +11,8 @@ import WorkflowExecutionView from '../components/workflows/WorkflowExecutionView
 import WorkflowTemplates from '../components/workflows/WorkflowTemplates';
 import TemplateConfigDialog from '../components/workflows/TemplateConfigDialog';
 import AIWorkflowGenerator from '../components/workflows/AIWorkflowGenerator';
+import WorkflowTemplateLibrary from '../components/workflows/WorkflowTemplateLibrary';
+import TemplateCustomizer from '../components/workflows/TemplateCustomizer';
 import WorkflowOptimizationAssistant from '../components/workflows/WorkflowOptimizationAssistant';
 import PerformanceAnalysisEngine from '../components/workflows/PerformanceAnalysisEngine';
 import WorkflowApprovalPanel from '../components/workflows/WorkflowApprovalPanel';
@@ -28,6 +30,7 @@ export default function WorkflowsPage() {
     const [currentExecution, setCurrentExecution] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedTemplate, setSelectedTemplate] = useState(null);
+    const [selectedTemplateForCustom, setSelectedTemplateForCustom] = useState(null);
     const [showTemplateCustomizer, setShowTemplateCustomizer] = useState(false);
 
     useEffect(() => {
@@ -306,6 +309,17 @@ export default function WorkflowsPage() {
                             agents={agents}
                             onUseTemplate={setSelectedTemplate}
                         />
+                        <div className="mt-12 border-t pt-12">
+                            <h3 className="text-lg font-semibold text-slate-700 mb-6 uppercase tracking-wide text-xs">
+                                Database Templates
+                            </h3>
+                            <WorkflowTemplateLibrary
+                                onSelectTemplate={(template) => {
+                                    setSelectedTemplateForCustom(template);
+                                    setShowTemplateCustomizer(true);
+                                }}
+                            />
+                        </div>
                     </TabsContent>
 
                     {/* Workflows Tab */}
@@ -487,6 +501,33 @@ export default function WorkflowsPage() {
                 onCreate={async (workflowData) => {
                     await handleSaveWorkflow(workflowData);
                     setSelectedTemplate(null);
+                }}
+            />
+
+            {/* Template Customizer for Database Templates */}
+            <TemplateCustomizer
+                template={selectedTemplateForCustom}
+                open={showTemplateCustomizer}
+                onClose={() => {
+                    setShowTemplateCustomizer(false);
+                    setSelectedTemplateForCustom(null);
+                }}
+                onSave={async (customizedWorkflow) => {
+                    await handleSaveWorkflow(customizedWorkflow);
+                    
+                    // Increment use count
+                    if (selectedTemplateForCustom) {
+                        try {
+                            await base44.entities.WorkflowTemplate.update(selectedTemplateForCustom.id, {
+                                use_count: (selectedTemplateForCustom.use_count || 0) + 1
+                            });
+                        } catch (error) {
+                            console.error('Failed to update template use count:', error);
+                        }
+                    }
+                    
+                    setShowTemplateCustomizer(false);
+                    setSelectedTemplateForCustom(null);
                 }}
             />
         </div>
