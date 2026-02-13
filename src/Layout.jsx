@@ -10,10 +10,10 @@ function LayoutContent({ children, currentPageName }) {
     
     const navLinkClass = (pageName) => {
         const isActive = currentPageName === pageName;
-        return `flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+        return `flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-medium ${
             isActive 
-                ? 'bg-blue-600 text-white' 
-                : 'text-slate-600 hover:bg-slate-100'
+                ? 'bg-blue-600 text-white shadow-sm' 
+                : 'text-slate-700 hover:bg-slate-100'
         }`;
     };
 

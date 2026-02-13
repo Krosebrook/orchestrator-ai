@@ -141,10 +141,10 @@ export default function AgentsPage() {
                             </SheetContent>
                         </Sheet>
                         <div>
-                            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                                Agent Orchestration
+                            <h1 className="text-2xl font-black text-slate-900">
+                                Agents
                             </h1>
-                            <p className="text-sm text-slate-500">Manage your AI agents</p>
+                            <p className="text-sm text-slate-600">Select an agent to start a conversation</p>
                         </div>
                     </div>
                     <div className="flex gap-2">
@@ -178,7 +178,7 @@ export default function AgentsPage() {
                                 <AutomationRuleManager agents={agents} />
                             </div>
                         )}
-                        <h2 className="text-xl font-semibold text-slate-800 mb-6">Select an Agent</h2>
+                        <h2 className="text-lg font-semibold text-slate-700 mb-6 uppercase tracking-wide text-xs">Available Agents</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {agents.map((agent) => {
                                 const profile = agentProfiles.find(p => p.agent_name === agent.name);
