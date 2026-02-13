@@ -449,7 +449,7 @@ const CATEGORIES = [
     { id: 'data_analysis', label: 'Data Analysis', count: TEMPLATES.filter(t => t.category === 'data_analysis').length }
 ];
 
-export default function WorkflowTemplates({ agents, onUseTemplate }) {
+export default function WorkflowTemplates({ agents = [], onUseTemplate }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [previewTemplate, setPreviewTemplate] = useState(null);
