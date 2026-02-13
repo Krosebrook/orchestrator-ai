@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { GraduationCap, Plus, BookOpen, Target, TrendingUp } from 'lucide-react';
+import { GraduationCap, Plus, BookOpen, Target, TrendingUp, Database, Play, Award } from 'lucide-react';
 import { toast } from 'sonner';
 import TrainingModuleCreator from '../components/training/TrainingModuleCreator';
 import TrainingModuleCard from '../components/training/TrainingModuleCard';
@@ -12,6 +12,10 @@ import TrainingRecommendations from '../components/training/TrainingRecommendati
 import TrainingAnalytics from '../components/training/TrainingAnalytics';
 import AICoachingSystem from '../components/training/AICoachingSystem';
 import PredictiveSkillGapAnalyzer from '../components/training/PredictiveSkillGapAnalyzer';
+import TrainingDatasetManager from '../components/training/TrainingDatasetManager';
+import AgentTrainingModule from '../components/training/AgentTrainingModule';
+import SkillImprovementTracker from '../components/training/SkillImprovementTracker';
+import AITrainingSuggestions from '../components/training/AITrainingSuggestions';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function TrainingHubPage() {
@@ -19,6 +23,8 @@ export default function TrainingHubPage() {
     const [modules, setModules] = useState([]);
     const [sessions, setSessions] = useState([]);
     const [recommendations, setRecommendations] = useState([]);
+    const [datasets, setDatasets] = useState([]);
+    const [progressData, setProgressData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModuleCreator, setShowModuleCreator] = useState(false);
     const [selectedModule, setSelectedModule] = useState(null);
@@ -31,17 +37,21 @@ export default function TrainingHubPage() {
 
     const loadData = async () => {
         try {
-            const [agentsList, modulesList, sessionsList, recsList] = await Promise.all([
+            const [agentsList, modulesList, sessionsList, recsList, datasetsList, progressList] = await Promise.all([
                 base44.agents.listAgents(),
                 base44.entities.TrainingModule.list('-updated_date'),
                 base44.entities.TrainingSession.list('-created_date', 100),
-                base44.entities.TrainingRecommendation.filter({ status: 'pending' })
+                base44.entities.TrainingRecommendation.filter({ status: 'pending' }),
+                base44.entities.TrainingDataset.list('-updated_date'),
+                base44.entities.AgentTrainingProgress.list('-updated_date')
             ]);
 
             setAgents(agentsList || []);
             setModules(modulesList || []);
             setSessions(sessionsList || []);
             setRecommendations(recsList || []);
+            setDatasets(datasetsList || []);
+            setProgressData(progressList || []);
         } catch (error) {
             console.error('Failed to load data:', error);
             toast.error('Failed to load training data');
@@ -163,14 +173,49 @@ export default function TrainingHubPage() {
                     </Card>
                 </div>
 
-                <Tabs defaultValue="predictive">
+                <Tabs defaultValue="datasets">
                     <TabsList className="bg-white">
+                        <TabsTrigger value="datasets">
+                            <Database className="h-4 w-4 mr-2" />
+                            Datasets
+                        </TabsTrigger>
+                        <TabsTrigger value="training">
+                            <Play className="h-4 w-4 mr-2" />
+                            Training
+                        </TabsTrigger>
+                        <TabsTrigger value="improvement">
+                            <Award className="h-4 w-4 mr-2" />
+                            Progress
+                        </TabsTrigger>
                         <TabsTrigger value="predictive">Future Skills</TabsTrigger>
-                        <TabsTrigger value="modules">Training Modules</TabsTrigger>
+                        <TabsTrigger value="modules">Modules</TabsTrigger>
                         <TabsTrigger value="coaching">AI Coaching</TabsTrigger>
-                        <TabsTrigger value="recommendations">AI Recommendations</TabsTrigger>
+                        <TabsTrigger value="recommendations">Recommendations</TabsTrigger>
                         <TabsTrigger value="analytics">Analytics</TabsTrigger>
                     </TabsList>
+
+                    <TabsContent value="datasets" className="mt-6">
+                        <TrainingDatasetManager 
+                            agents={agents}
+                            onDatasetCreated={loadData}
+                        />
+                    </TabsContent>
+
+                    <TabsContent value="training" className="mt-6 space-y-6">
+                        <AgentTrainingModule 
+                            agents={agents}
+                            datasets={datasets}
+                            onTrainingComplete={loadData}
+                        />
+                        <AITrainingSuggestions 
+                            agents={agents}
+                            progressData={progressData}
+                        />
+                    </TabsContent>
+
+                    <TabsContent value="improvement" className="mt-6">
+                        <SkillImprovementTracker agents={agents} />
+                    </TabsContent>
 
                     <TabsContent value="predictive" className="mt-6">
                         <PredictiveSkillGapAnalyzer agents={agents} />
