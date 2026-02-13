@@ -1,7 +1,8 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, Circle, Award } from 'lucide-react';
+import { CheckCircle, Circle, Award, Shield } from 'lucide-react';
+import SkillVerificationBadge from './SkillVerificationBadge';
 
 export default function AgentSkillMatrix({ agents, skills, searchQuery, onSelectAgent }) {
     const filteredAgents = agents.filter(a =>
@@ -101,6 +102,10 @@ export default function AgentSkillMatrix({ agents, skills, searchQuery, onSelect
                                                     <Badge className={getCertificationColor(skill.certification_level)}>
                                                         {skill.certification_level}
                                                     </Badge>
+                                                    <SkillVerificationBadge 
+                                                        verified={skill.verified_by}
+                                                        verifiedBy={skill.verified_by}
+                                                    />
                                                 </div>
                                                 <Progress value={skill.proficiency_level || 0} className="h-1" />
                                             </div>
@@ -116,8 +121,8 @@ export default function AgentSkillMatrix({ agents, skills, searchQuery, onSelect
                             {/* Verified Skills */}
                             {agentSkills.filter(s => s.verified_by).length > 0 && (
                                 <div className="flex items-center gap-1 text-xs text-green-600">
-                                    <CheckCircle className="h-3 w-3" />
-                                    {agentSkills.filter(s => s.verified_by).length} verified skills
+                                    <Shield className="h-3 w-3" />
+                                    {agentSkills.filter(s => s.verified_by).length} verified
                                 </div>
                             )}
                         </CardContent>

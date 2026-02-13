@@ -3,11 +3,12 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, Search, Plus, TrendingUp, Book } from 'lucide-react';
+import { Brain, Search, Plus, TrendingUp, Book, Shield } from 'lucide-react';
 import AgentSkillMatrix from '../components/skills/AgentSkillMatrix';
 import SkillDefinitionManager from '../components/skills/SkillDefinitionManager';
 import KnowledgeAccessDashboard from '../components/skills/KnowledgeAccessDashboard';
 import SkillLearningAnalytics from '../components/skills/SkillLearningAnalytics';
+import SkillVerificationPanel from '../components/skills/SkillVerificationPanel';
 import { toast } from 'sonner';
 
 export default function AgentSkillsManagementPage() {
@@ -127,6 +128,10 @@ export default function AgentSkillsManagementPage() {
                             <Plus className="h-4 w-4 mr-2" />
                             Manage Skills
                         </TabsTrigger>
+                        <TabsTrigger value="verification">
+                            <Shield className="h-4 w-4 mr-2" />
+                            Verification
+                        </TabsTrigger>
                         <TabsTrigger value="knowledge">
                             <Book className="h-4 w-4 mr-2" />
                             Knowledge Access
@@ -156,6 +161,11 @@ export default function AgentSkillsManagementPage() {
                             onUpdate={handleUpdateSkill}
                             onDelete={handleDeleteSkill}
                         />
+                    </TabsContent>
+
+                    {/* Verification Tab */}
+                    <TabsContent value="verification">
+                        <SkillVerificationPanel onRefresh={loadData} />
                     </TabsContent>
 
                     {/* Knowledge Access Tab */}

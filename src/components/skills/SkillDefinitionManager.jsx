@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { base44 } from "@/api/base44Client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,8 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, Save, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Save, X, Shield } from 'lucide-react';
 import { Slider } from "@/components/ui/slider";
+import SkillVerificationBadge from './SkillVerificationBadge';
+import { toast } from 'sonner';
 
 export default function SkillDefinitionManager({ agents, skills, onCreate, onUpdate, onDelete }) {
     const [showDialog, setShowDialog] = useState(false);
@@ -21,6 +24,27 @@ export default function SkillDefinitionManager({ agents, skills, onCreate, onUpd
         description: '',
         certification_level: 'beginner'
     });
+
+    const handleRequestVerification = async (skill) => {
+        try {
+            await base44.entities.SkillVerificationRequest.create({
+                skill_id: skill.id,
+                agent_name: skill.agent_name,
+                skill_name: skill.skill_name,
+                requested_by: skill.agent_name,
+                request_type: 'self_request',
+                justification: `Requesting verification for ${skill.skill_name}`,
+                evidence: {
+                    usage_count: skill.usage_count || 0,
+                    success_rate: skill.success_rate || 0
+                }
+            });
+            toast.success('Verification requested');
+        } catch (error) {
+            console.error('Failed to request verification:', error);
+            toast.error('Failed to request verification');
+        }
+    };
 
     const handleOpenDialog = (skill = null) => {
         if (skill) {
@@ -83,7 +107,7 @@ export default function SkillDefinitionManager({ agents, skills, onCreate, onUpd
                             {agentSkills.map((skill) => (
                                 <div key={skill.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                                     <div className="flex-1">
-                                        <div className="flex items-center gap-2 mb-1">
+                                        <div className="flex items-center gap-2 mb-1 flex-wrap">
                                             <span className="font-semibold text-sm">{skill.skill_name}</span>
                                             <Badge variant="outline" className="text-xs">
                                                 {skill.skill_category}
@@ -96,6 +120,10 @@ export default function SkillDefinitionManager({ agents, skills, onCreate, onUpd
                                             }>
                                                 {skill.certification_level}
                                             </Badge>
+                                            <SkillVerificationBadge 
+                                                verified={skill.verified_by}
+                                                verifiedBy={skill.verified_by}
+                                            />
                                         </div>
                                         {skill.description && (
                                             <p className="text-xs text-slate-600">{skill.description}</p>
@@ -112,6 +140,17 @@ export default function SkillDefinitionManager({ agents, skills, onCreate, onUpd
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
+                                        {!skill.verified_by && (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleRequestVerification(skill)}
+                                                className="text-blue-600"
+                                            >
+                                                <Shield className="h-4 w-4 mr-1" />
+                                                Verify
+                                            </Button>
+                                        )}
                                         <Button
                                             variant="ghost"
                                             size="icon"
