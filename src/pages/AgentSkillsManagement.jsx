@@ -157,6 +157,14 @@ export default function AgentSkillsManagementPage() {
                         />
                     </TabsContent>
 
+                    {/* Cross-Agent Comparison Tab */}
+                    <TabsContent value="comparison">
+                        <CrossAgentSkillComparison
+                            agents={agents}
+                            skills={skills}
+                        />
+                    </TabsContent>
+
                     {/* Manage Skills Tab */}
                     <TabsContent value="manage">
                         <SkillDefinitionManager
