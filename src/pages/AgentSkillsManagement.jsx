@@ -3,12 +3,13 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, Search, Plus, TrendingUp, Book, Shield } from 'lucide-react';
+import { Brain, Search, Plus, TrendingUp, Book, Shield, Users } from 'lucide-react';
 import AgentSkillMatrix from '../components/skills/AgentSkillMatrix';
 import SkillDefinitionManager from '../components/skills/SkillDefinitionManager';
 import KnowledgeAccessDashboard from '../components/skills/KnowledgeAccessDashboard';
 import SkillLearningAnalytics from '../components/skills/SkillLearningAnalytics';
 import SkillVerificationPanel from '../components/skills/SkillVerificationPanel';
+import CrossAgentSkillComparison from '../components/skills/CrossAgentSkillComparison';
 import { toast } from 'sonner';
 
 export default function AgentSkillsManagementPage() {
@@ -123,6 +124,10 @@ export default function AgentSkillsManagementPage() {
                         <TabsTrigger value="matrix">
                             <Brain className="h-4 w-4 mr-2" />
                             Skills Matrix
+                        </TabsTrigger>
+                        <TabsTrigger value="comparison">
+                            <Users className="h-4 w-4 mr-2" />
+                            Compare
                         </TabsTrigger>
                         <TabsTrigger value="manage">
                             <Plus className="h-4 w-4 mr-2" />

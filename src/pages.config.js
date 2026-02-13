@@ -64,9 +64,9 @@ import RealTimeAgentMonitor from './pages/RealTimeAgentMonitor';
 import RoleManagement from './pages/RoleManagement';
 import TrainingHub from './pages/TrainingHub';
 import UserManagement from './pages/UserManagement';
+import WorkflowAnalytics from './pages/WorkflowAnalytics';
 import WorkflowCICD from './pages/WorkflowCICD';
 import Workflows from './pages/Workflows';
-import WorkflowAnalytics from './pages/WorkflowAnalytics';
 import __Layout from './Layout.jsx';
 
 
@@ -88,9 +88,9 @@ export const PAGES = {
     "RoleManagement": RoleManagement,
     "TrainingHub": TrainingHub,
     "UserManagement": UserManagement,
+    "WorkflowAnalytics": WorkflowAnalytics,
     "WorkflowCICD": WorkflowCICD,
     "Workflows": Workflows,
-    "WorkflowAnalytics": WorkflowAnalytics,
 }
 
 export const pagesConfig = {
