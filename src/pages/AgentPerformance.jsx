@@ -100,10 +100,10 @@ export default function AgentPerformancePage() {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            Agent Performance Dashboard
+                        <h1 className="text-5xl font-black text-slate-900">
+                            Performance
                         </h1>
-                        <p className="text-slate-600 mt-1">Monitor and analyze agent metrics in real-time</p>
+                        <p className="text-slate-600 mt-2 text-lg">Monitor and analyze agent metrics</p>
                     </div>
                     <div className="flex items-center gap-3">
                         <Select value={selectedAgent} onValueChange={setSelectedAgent}>

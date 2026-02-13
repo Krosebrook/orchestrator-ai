@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { LayoutDashboard, Bot, Workflow, Home, Plug, Rocket, BookOpen, Shield, BarChart3, GitMerge, Users, Sparkles, Activity } from 'lucide-react';
+import { LayoutDashboard, Bot, Workflow, Home, Plug, Rocket, BookOpen, Shield, BarChart3, GitMerge, Users, Sparkles, Activity, Settings, Brain } from 'lucide-react';
 import { PermissionsProvider, usePermissions } from './components/rbac/PermissionCheck';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 function LayoutContent({ children, currentPageName }) {
     const { canAccessResource, loading } = usePermissions();
@@ -37,100 +39,153 @@ function LayoutContent({ children, currentPageName }) {
                             <span className="text-xl font-bold text-slate-800">AI Platform</span>
                         </Link>
                         
-                        <div className="flex items-center gap-2">
-                        <Link to={createPageUrl('Landing')} className={navLinkClass('Landing')}>
-                        <Home className="h-4 w-4" />
-                        Home
-                        </Link>
-                        <Link to={createPageUrl('GettingStarted')} className={navLinkClass('GettingStarted')}>
-                        <BookOpen className="h-4 w-4" />
-                        Getting Started
-                        </Link>
-                        <Link to={createPageUrl('Dashboard')} className={navLinkClass('Dashboard')}>
-                        <LayoutDashboard className="h-4 w-4" />
-                        Dashboard
-                        </Link>
-                        {canAccessResource('agents') && (
-                        <Link to={createPageUrl('Agents')} className={navLinkClass('Agents')}>
-                            <Bot className="h-4 w-4" />
-                            Agents
-                        </Link>
-                        )}
-                        {canAccessResource('workflows') && (
-                        <Link to={createPageUrl('Workflows')} className={navLinkClass('Workflows')}>
-                            <Workflow className="h-4 w-4" />
-                            Workflows
-                        </Link>
-                        )}
-                        {canAccessResource('integrations') && (
-                        <Link to={createPageUrl('Integrations')} className={navLinkClass('Integrations')}>
-                            <Plug className="h-4 w-4" />
-                            Integrations
-                        </Link>
-                        )}
-                        {canAccessResource('deployments') && (
-                        <Link to={createPageUrl('Deployments')} className={navLinkClass('Deployments')}>
-                            <Rocket className="h-4 w-4" />
-                            Deployments
-                        </Link>
-                        )}
-                        <Link to={createPageUrl('AgentPerformance')} className={navLinkClass('AgentPerformance')}>
-                            <BarChart3 className="h-4 w-4" />
-                            Performance
-                        </Link>
-                        <Link to={createPageUrl('Orchestration')} className={navLinkClass('Orchestration')}>
-                            <GitMerge className="h-4 w-4" />
-                            Orchestration
-                        </Link>
-                        <Link to={createPageUrl('AgentCollaborationHub')} className={navLinkClass('AgentCollaborationHub')}>
-                            <Users className="h-4 w-4" />
-                            Collaboration
-                        </Link>
-                        <Link to={createPageUrl('TrainingHub')} className={navLinkClass('TrainingHub')}>
-                            <Sparkles className="h-4 w-4" />
-                            Training
-                        </Link>
-                        <Link to={createPageUrl('MonitoringDashboard')} className={navLinkClass('MonitoringDashboard')}>
-                            <Activity className="h-4 w-4" />
-                            Monitoring
-                        </Link>
-                        <Link to={createPageUrl('KnowledgeBase')} className={navLinkClass('KnowledgeBase')}>
-                            <BookOpen className="h-4 w-4" />
-                            Knowledge
-                        </Link>
-                        <Link to={createPageUrl('AgentSkillsManagement')} className={navLinkClass('AgentSkillsManagement')}>
-                            <Activity className="h-4 w-4" />
-                            Skills
-                        </Link>
-                        {canAccessResource('admin') && (
-                        <>
-                            <Link to={createPageUrl('WorkflowCICD')} className={navLinkClass('WorkflowCICD')}>
-                                <Rocket className="h-4 w-4" />
-                                CI/CD
+                        <div className="flex items-center gap-1">
+                            {/* PRIMARY NAVIGATION */}
+                            <Link to={createPageUrl('Dashboard')} className={navLinkClass('Dashboard')}>
+                            <LayoutDashboard className="h-4 w-4" />
+                            Command Center
                             </Link>
-                            <Link to={createPageUrl('RealTimeAgentMonitor')} className={navLinkClass('RealTimeAgentMonitor')}>
-                                <Activity className="h-4 w-4" />
-                                Monitor
+                            {canAccessResource('agents') && (
+                            <Link to={createPageUrl('Agents')} className={navLinkClass('Agents')}>
+                                <Bot className="h-4 w-4" />
+                                Agents
                             </Link>
-                        </>
-                        )}
-                        {canAccessResource('admin') && (
-                        <>
-                            <Link to={createPageUrl('RoleManagement')} className={navLinkClass('RoleManagement')}>
-                                <Shield className="h-4 w-4" />
-                                Roles
+                            )}
+                            {canAccessResource('workflows') && (
+                            <Link to={createPageUrl('Workflows')} className={navLinkClass('Workflows')}>
+                                <Workflow className="h-4 w-4" />
+                                Workflows
                             </Link>
-                            <Link to={createPageUrl('UserManagement')} className={navLinkClass('UserManagement')}>
-                                <Shield className="h-4 w-4" />
-                                Users
-                            </Link>
-                            <Link to={createPageUrl('AgentProfileAdmin')} className={navLinkClass('AgentProfileAdmin')}>
-                                <Shield className="h-4 w-4" />
-                                Agent Admin
-                            </Link>
-                        </>
-                        )}
-                        </div>
+                            )}
+
+                            {/* CONTEXTUAL NAVIGATION */}
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100">
+                                        <GitMerge className="h-4 w-4 mr-2" />
+                                        Operations
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-56">
+                                    <DropdownMenuItem asChild>
+                                        <Link to={createPageUrl('AgentPerformance')} className="flex items-center">
+                                            <BarChart3 className="h-4 w-4 mr-2" />
+                                            Performance
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link to={createPageUrl('Orchestration')} className="flex items-center">
+                                            <GitMerge className="h-4 w-4 mr-2" />
+                                            Orchestration
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link to={createPageUrl('AgentCollaborationHub')} className="flex items-center">
+                                            <Users className="h-4 w-4 mr-2" />
+                                            Collaboration
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link to={createPageUrl('MonitoringDashboard')} className="flex items-center">
+                                            <Activity className="h-4 w-4 mr-2" />
+                                            Monitoring
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    {canAccessResource('admin') && (
+                                        <DropdownMenuItem asChild>
+                                            <Link to={createPageUrl('RealTimeAgentMonitor')} className="flex items-center">
+                                                <Activity className="h-4 w-4 mr-2" />
+                                                Real-Time Monitor
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    )}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100">
+                                        <Settings className="h-4 w-4 mr-2" />
+                                        Configure
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-56">
+                                    {canAccessResource('integrations') && (
+                                        <DropdownMenuItem asChild>
+                                            <Link to={createPageUrl('Integrations')} className="flex items-center">
+                                                <Plug className="h-4 w-4 mr-2" />
+                                                Integrations
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    )}
+                                    <DropdownMenuItem asChild>
+                                        <Link to={createPageUrl('AgentSkillsManagement')} className="flex items-center">
+                                            <Brain className="h-4 w-4 mr-2" />
+                                            Skills & Knowledge
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link to={createPageUrl('TrainingHub')} className="flex items-center">
+                                            <Sparkles className="h-4 w-4 mr-2" />
+                                            Training
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link to={createPageUrl('KnowledgeBase')} className="flex items-center">
+                                            <BookOpen className="h-4 w-4 mr-2" />
+                                            Knowledge Base
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    {canAccessResource('deployments') && (
+                                        <DropdownMenuItem asChild>
+                                            <Link to={createPageUrl('Deployments')} className="flex items-center">
+                                                <Rocket className="h-4 w-4 mr-2" />
+                                                Deployments
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    )}
+                                    {canAccessResource('admin') && (
+                                        <DropdownMenuItem asChild>
+                                            <Link to={createPageUrl('WorkflowCICD')} className="flex items-center">
+                                                <Rocket className="h-4 w-4 mr-2" />
+                                                CI/CD Pipeline
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    )}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+
+                            {canAccessResource('admin') && (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" className="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100">
+                                            <Shield className="h-4 w-4 mr-2" />
+                                            Admin
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-56">
+                                        <DropdownMenuItem asChild>
+                                            <Link to={createPageUrl('RoleManagement')} className="flex items-center">
+                                                <Shield className="h-4 w-4 mr-2" />
+                                                Roles
+                                            </Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem asChild>
+                                            <Link to={createPageUrl('UserManagement')} className="flex items-center">
+                                                <Users className="h-4 w-4 mr-2" />
+                                                Users
+                                            </Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem asChild>
+                                            <Link to={createPageUrl('AgentProfileAdmin')} className="flex items-center">
+                                                <Bot className="h-4 w-4 mr-2" />
+                                                Agent Admin
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            )}
+                            </div>
                     </div>
                 </div>
             </nav>

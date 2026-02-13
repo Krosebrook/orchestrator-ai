@@ -1,188 +1,193 @@
 import { useState, useEffect } from 'react';
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { LayoutDashboard, User, Settings, PlayCircle } from 'lucide-react';
-import DashboardCustomizer from '../components/dashboards/DashboardCustomizer';
-import NaturalLanguageQuery from '../components/dashboards/NaturalLanguageQuery';
-import OnboardingTutorial from '../components/onboarding/OnboardingTutorial';
-import ProactiveAssistant from '../components/proactive/ProactiveAssistant';
-import ExecutiveDashboard from '../components/dashboards/ExecutiveDashboard';
-import MarketingDashboard from '../components/dashboards/MarketingDashboard';
-import SalesDashboard from '../components/dashboards/SalesDashboard';
-import ProductDashboard from '../components/dashboards/ProductDashboard';
-import SupportDashboard from '../components/dashboards/SupportDashboard';
-import HRDashboard from '../components/dashboards/HRDashboard';
-import DeveloperDashboard from '../components/dashboards/DeveloperDashboard';
-import AnalystDashboard from '../components/dashboards/AnalystDashboard';
-import ContentCreatorDashboard from '../components/dashboards/ContentCreatorDashboard';
-import OperationsDashboard from '../components/dashboards/OperationsDashboard';
-
-const PERSONAS = [
-    { id: 'executive', name: 'Executive', component: ExecutiveDashboard },
-    { id: 'marketing_manager', name: 'Marketing Manager', component: MarketingDashboard },
-    { id: 'sales_rep', name: 'Sales Representative', component: SalesDashboard },
-    { id: 'product_manager', name: 'Product Manager', component: ProductDashboard },
-    { id: 'customer_support', name: 'Customer Support', component: SupportDashboard },
-    { id: 'hr_manager', name: 'HR Manager', component: HRDashboard },
-    { id: 'developer', name: 'Developer', component: DeveloperDashboard },
-    { id: 'data_analyst', name: 'Data Analyst', component: AnalystDashboard },
-    { id: 'content_creator', name: 'Content Creator', component: ContentCreatorDashboard },
-    { id: 'operations_manager', name: 'Operations Manager', component: OperationsDashboard }
-];
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Workflow, MessageSquare, Play, CheckCircle, TrendingUp, Clock, AlertTriangle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import LiveActivityRail from '../components/shared/LiveActivityRail';
 
 export default function DashboardPage() {
     const [user, setUser] = useState(null);
-    const [userProfile, setUserProfile] = useState(null);
-    const [selectedPersona, setSelectedPersona] = useState('executive');
+    const [stats, setStats] = useState({
+        tasksToday: 0,
+        successRate: 0,
+        idleAgents: 0,
+        activeWorkflows: 0
+    });
+    const [recentResults, setRecentResults] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [showCustomizer, setShowCustomizer] = useState(false);
-    const [dashboardLayout, setDashboardLayout] = useState(null);
-    const [showOnboarding, setShowOnboarding] = useState(false);
 
     useEffect(() => {
-        loadUserData();
+        loadData();
     }, []);
 
-    useEffect(() => {
-        // Check if user needs onboarding
-        if (user && !user.onboarding_completed) {
-            setShowOnboarding(true);
-        }
-    }, [user]);
-
-    const loadUserData = async () => {
+    const loadData = async () => {
         try {
             const currentUser = await base44.auth.me();
             setUser(currentUser);
 
-            const profiles = await base44.entities.UserProfile.filter({ user_email: currentUser.email });
-            if (profiles && profiles.length > 0) {
-                setUserProfile(profiles[0]);
-                setSelectedPersona(profiles[0].persona);
-            }
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const [metrics, statuses, executions] = await Promise.all([
+                base44.entities.AgentPerformanceMetric.filter({ 
+                    created_date: { $gte: today.toISOString() } 
+                }),
+                base44.entities.AgentStatus.list(),
+                base44.entities.WorkflowExecution.list('-created_date', 10)
+            ]);
+
+            const successCount = metrics.filter(m => m.status === 'success').length;
+            const totalTasks = metrics.length;
+            const idleCount = statuses.filter(s => s.status === 'idle').length;
+            const activeCount = statuses.filter(s => s.status === 'active' || s.status === 'busy').length;
+
+            setStats({
+                tasksToday: totalTasks,
+                successRate: totalTasks > 0 ? Math.round((successCount / totalTasks) * 100) : 0,
+                idleAgents: idleCount,
+                activeWorkflows: activeCount
+            });
+
+            const recent = executions
+                .filter(e => e.status === 'completed' || e.status === 'success')
+                .slice(0, 5)
+                .map(e => ({
+                    id: e.id,
+                    title: e.workflow_name || 'Workflow',
+                    time: new Date(e.updated_date),
+                    success: e.status === 'completed' || e.status === 'success'
+                }));
+
+            setRecentResults(recent);
         } catch (error) {
-            console.error('Failed to load user data:', error);
+            console.error('Failed to load dashboard data:', error);
         } finally {
             setLoading(false);
         }
     };
 
-    const handlePersonaChange = async (persona) => {
-        setSelectedPersona(persona);
-        
-        if (user) {
-            try {
-                if (userProfile) {
-                    await base44.entities.UserProfile.update(userProfile.id, { persona });
-                } else {
-                    await base44.entities.UserProfile.create({
-                        user_email: user.email,
-                        persona
-                    });
-                }
-                await loadUserData();
-            } catch (error) {
-                console.error('Failed to update persona:', error);
-            }
-        }
-    };
-
     if (loading) {
         return (
-            <div className="h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <LayoutDashboard className="h-16 w-16 text-blue-600 mx-auto mb-4 animate-pulse" />
-                    <p className="text-slate-600">Loading dashboard...</p>
-                </div>
+            <div className="min-h-screen bg-white flex items-center justify-center">
+                <div className="animate-pulse text-slate-400">Loading...</div>
             </div>
         );
     }
 
-    const currentPersona = PERSONAS.find(p => p.id === selectedPersona);
-    const DashboardComponent = currentPersona?.component;
-
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-            {/* Header */}
-            <div className="bg-white border-b border-slate-200 px-6 py-4">
-                <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <LayoutDashboard className="h-6 w-6 text-blue-600" />
-                        <div>
-                            <h1 className="text-xl font-bold text-slate-800">Dashboard</h1>
-                            <p className="text-sm text-slate-500">{currentPersona?.name}</p>
+        <div className="min-h-screen bg-white">
+            <LiveActivityRail />
+            
+            <div className="max-w-6xl mx-auto px-8 py-12">
+                {/* Hero Section */}
+                <div className="text-center mb-16">
+                    <h1 className="text-5xl font-black text-slate-900 mb-4">
+                        Command Center
+                    </h1>
+                    <p className="text-xl text-slate-600">
+                        Mission control for your AI agents
+                    </p>
+                </div>
+
+                {/* Quick Actions - DOMINANT FOCAL POINT */}
+                <div className="mb-16 bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-12 border border-slate-200">
+                    <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Quick Actions</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                        <Link to={createPageUrl('Workflows')}>
+                            <Button 
+                                size="lg" 
+                                className="w-full h-24 text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg"
+                            >
+                                <Workflow className="h-6 w-6 mr-3" />
+                                Run Workflow
+                            </Button>
+                        </Link>
+                        <Link to={createPageUrl('Agents')}>
+                            <Button 
+                                size="lg" 
+                                variant="outline"
+                                className="w-full h-24 text-lg border-2 hover:bg-slate-50"
+                            >
+                                <MessageSquare className="h-6 w-6 mr-3" />
+                                Chat with Agent
+                            </Button>
+                        </Link>
+                    </div>
+                </div>
+
+                {/* System Health */}
+                <div className="mb-12">
+                    <h3 className="text-lg font-semibold text-slate-700 mb-6 uppercase tracking-wide text-xs">
+                        System Health
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <Card className="border-l-4 border-blue-600">
+                            <CardContent className="pt-6">
+                                <p className="text-sm text-slate-600 mb-1">Tasks Today</p>
+                                <p className="text-4xl font-bold text-slate-900">{stats.tasksToday}</p>
+                            </CardContent>
+                        </Card>
+                        <Card className="border-l-4 border-green-600">
+                            <CardContent className="pt-6">
+                                <p className="text-sm text-slate-600 mb-1">Success Rate</p>
+                                <p className="text-4xl font-bold text-green-600">{stats.successRate}%</p>
+                            </CardContent>
+                        </Card>
+                        <Card className="border-l-4 border-amber-600">
+                            <CardContent className="pt-6">
+                                <p className="text-sm text-slate-600 mb-1">Idle Agents</p>
+                                <p className="text-4xl font-bold text-amber-600">{stats.idleAgents}</p>
+                            </CardContent>
+                        </Card>
+                        <Card className="border-l-4 border-purple-600">
+                            <CardContent className="pt-6">
+                                <p className="text-sm text-slate-600 mb-1">Active</p>
+                                <p className="text-4xl font-bold text-purple-600">{stats.activeWorkflows}</p>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+
+                {/* Recent Results */}
+                <div>
+                    <h3 className="text-lg font-semibold text-slate-700 mb-6 uppercase tracking-wide text-xs">
+                        Recent Results
+                    </h3>
+                    {recentResults.length === 0 ? (
+                        <Card>
+                            <CardContent className="py-12 text-center">
+                                <Play className="h-12 w-12 text-slate-300 mx-auto mb-3" />
+                                <p className="text-slate-500 mb-4">No executions yet</p>
+                                <Link to={createPageUrl('Workflows')}>
+                                    <Button variant="outline">
+                                        Run Your First Workflow
+                                    </Button>
+                                </Link>
+                            </CardContent>
+                        </Card>
+                    ) : (
+                        <div className="space-y-2">
+                            {recentResults.map((result) => (
+                                <div 
+                                    key={result.id}
+                                    className="flex items-center justify-between py-3 px-4 hover:bg-slate-50 rounded-lg transition-colors border border-transparent hover:border-slate-200"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <CheckCircle className="h-5 w-5 text-green-600" />
+                                        <span className="text-slate-900 font-medium">{result.title}</span>
+                                    </div>
+                                    <span className="text-sm text-slate-500">
+                                        {Math.round((new Date() - result.time) / 1000 / 60)}m ago
+                                    </span>
+                                </div>
+                            ))}
                         </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setShowOnboarding(true)}
-                        >
-                            <PlayCircle className="h-4 w-4 mr-2" />
-                            Tutorial
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setShowCustomizer(true)}
-                        >
-                            <Settings className="h-4 w-4 mr-2" />
-                            Customize
-                        </Button>
-                        <Select value={selectedPersona} onValueChange={handlePersonaChange}>
-                            <SelectTrigger className="w-64">
-                                <User className="h-4 w-4 mr-2" />
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {PERSONAS.map((persona) => (
-                                    <SelectItem key={persona.id} value={persona.id}>
-                                        {persona.name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                    )}
                 </div>
             </div>
-
-            {/* Dashboard Content */}
-            <div className="p-6 space-y-6">
-                {/* Natural Language Query */}
-                <NaturalLanguageQuery user={user} />
-
-                {/* Proactive Assistant */}
-                <ProactiveAssistant />
-
-                {/* Persona Dashboard */}
-                {DashboardComponent ? (
-                    <DashboardComponent user={user} />
-                ) : (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Select a Persona</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-slate-600">Choose a persona from the dropdown to view the dashboard.</p>
-                        </CardContent>
-                    </Card>
-                )}
-
-                <DashboardCustomizer
-                    open={showCustomizer}
-                    onClose={() => setShowCustomizer(false)}
-                    onSave={(layout) => setDashboardLayout(layout)}
-                    currentLayout={dashboardLayout}
-                />
-
-                <OnboardingTutorial 
-                    open={showOnboarding} 
-                    onClose={() => setShowOnboarding(false)} 
-                />
-                </div>
-                </div>
-                );
-                }
+        </div>
+    );
+}

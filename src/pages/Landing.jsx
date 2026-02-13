@@ -100,10 +100,8 @@ export default function LandingPage() {
                             AI Agent Orchestration Platform
                         </Badge>
                         
-                        <h1 className="text-5xl lg:text-7xl font-bold tracking-tight">
-                            <span className="bg-gradient-to-r from-slate-900 via-blue-800 to-purple-900 bg-clip-text text-transparent">
-                                Automate Complex Tasks
-                            </span>
+                        <h1 className="text-5xl lg:text-7xl font-black tracking-tight text-slate-900">
+                            Automate Complex Tasks
                             <br />
                             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                                 with Multi-Agent AI
@@ -171,7 +169,7 @@ export default function LandingPage() {
             {/* Features Section */}
             <section className="max-w-7xl mx-auto px-6 py-20">
                 <div className="text-center mb-16">
-                    <h2 className="text-4xl font-bold text-slate-900 mb-4">
+                    <h2 className="text-4xl font-black text-slate-900 mb-4">
                         Everything You Need to Orchestrate AI Agents
                     </h2>
                     <p className="text-xl text-slate-600 max-w-2xl mx-auto">
