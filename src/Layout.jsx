@@ -96,6 +96,12 @@ function LayoutContent({ children, currentPageName }) {
                                             Monitoring
                                         </Link>
                                     </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link to={createPageUrl('WorkflowAnalytics')} className="flex items-center">
+                                            <BarChart3 className="h-4 w-4 mr-2" />
+                                            Analytics
+                                        </Link>
+                                    </DropdownMenuItem>
                                     {canAccessResource('admin') && (
                                         <DropdownMenuItem asChild>
                                             <Link to={createPageUrl('RealTimeAgentMonitor')} className="flex items-center">

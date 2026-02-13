@@ -66,6 +66,7 @@ import TrainingHub from './pages/TrainingHub';
 import UserManagement from './pages/UserManagement';
 import WorkflowCICD from './pages/WorkflowCICD';
 import Workflows from './pages/Workflows';
+import WorkflowAnalytics from './pages/WorkflowAnalytics';
 import __Layout from './Layout.jsx';
 
 
@@ -89,6 +90,7 @@ export const PAGES = {
     "UserManagement": UserManagement,
     "WorkflowCICD": WorkflowCICD,
     "Workflows": Workflows,
+    "WorkflowAnalytics": WorkflowAnalytics,
 }
 
 export const pagesConfig = {
