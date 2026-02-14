@@ -2,134 +2,175 @@ import { useState, useEffect } from 'react';
 import { base44 } from "@/api/base44Client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sparkles, BookOpen } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Lightbulb, BookOpen, X, ExternalLink } from 'lucide-react';
+import { toast } from 'sonner';
 
-export default function RealtimeArticleSuggester({ conversationId, currentMessages }) {
+export default function RealtimeArticleSuggester({ conversation, visible = true }) {
     const [suggestions, setSuggestions] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [dismissed, setDismissed] = useState(new Set());
+    const [analyzing, setAnalyzing] = useState(false);
 
     useEffect(() => {
-        if (currentMessages && currentMessages.length > 0) {
-            const lastMessage = currentMessages[currentMessages.length - 1];
-            if (lastMessage?.role === 'user' && lastMessage?.content) {
-                suggestArticles(lastMessage.content);
-            }
+        if (conversation?.messages?.length > 0 && visible) {
+            analyzeCon versation();
         }
-    }, [currentMessages?.length]);
+    }, [conversation?.messages?.length, visible]);
 
-    const suggestArticles = async (messageContent) => {
-        setLoading(true);
+    const analyzeConversation = async () => {
+        if (analyzing) return;
+        
+        setAnalyzing(true);
         try {
-            const articles = await base44.entities.KnowledgeArticle.list('-relevance_score', 100);
+            const recentMessages = conversation.messages?.slice(-5) || [];
+            if (recentMessages.length === 0) return;
+
+            const [articles, queries] = await Promise.all([
+                base44.entities.KnowledgeArticle.list('-access_count', 50),
+                base44.entities.KnowledgeQuery.filter({ results_found: false }, '-created_date', 20).catch(() => [])
+            ]);
+
+            const conversationContext = recentMessages.map(m => 
+                `${m.role}: ${m.content?.substring(0, 200)}`
+            ).join('\n');
 
             const result = await base44.integrations.Core.InvokeLLM({
-                prompt: `Based on this user message, suggest the most relevant knowledge articles:
+                prompt: `Analyze this conversation and suggest relevant knowledge articles:
 
-User Message: "${messageContent}"
+Conversation Context:
+${conversationContext}
 
 Available Articles:
-${articles.slice(0, 50).map((a, idx) => 
-    `${idx + 1}. ${a.title} (Category: ${a.category})
-   Content: ${a.content.substring(0, 200)}...
-   Tags: ${a.tags?.join(', ')}`
-).join('\n\n')}
+${articles.slice(0, 30).map(a => `- ${a.title} (${a.category}): ${a.content.substring(0, 150)}...`).join('\n')}
 
-Analyze the user's intent and information needs, then suggest the top 3-5 most relevant articles that could help address their query or provide useful context.`,
+Unanswered Questions (gaps):
+${queries.slice(0, 10).map(q => `- ${q.query}`).join('\n')}
+
+Suggest 2-3 most relevant articles that would help with this conversation.
+If there's a clear knowledge gap (question not covered), flag it.`,
                 response_json_schema: {
                     type: "object",
                     properties: {
-                        suggestions: {
+                        relevant_articles: {
                             type: "array",
                             items: {
                                 type: "object",
                                 properties: {
                                     article_title: { type: "string" },
-                                    relevance_reason: { type: "string" },
-                                    relevance_score: { type: "number" }
+                                    relevance: { type: "string" },
+                                    confidence: { type: "number" }
                                 }
                             }
-                        }
+                        },
+                        knowledge_gap: { type: "boolean" },
+                        gap_description: { type: "string" }
                     }
                 }
             });
 
-            const enrichedSuggestions = result.suggestions.map(sug => {
-                const article = articles.find(a => a.title === sug.article_title);
-                return { ...sug, article };
-            }).filter(s => s.article);
+            const matchedArticles = result.relevant_articles
+                .map(ra => {
+                    const article = articles.find(a => a.title === ra.article_title);
+                    return article ? { ...article, relevance: ra.relevance, confidence: ra.confidence } : null;
+                })
+                .filter(a => a && !dismissed.has(a.id));
 
-            setSuggestions(enrichedSuggestions);
+            setSuggestions(matchedArticles);
+
+            // Track knowledge gap
+            if (result.knowledge_gap) {
+                await base44.entities.KnowledgeQuery.create({
+                    query: result.gap_description,
+                    queried_by: 'conversation-analysis',
+                    results_found: false,
+                    knowledge_gap_identified: true,
+                    conversation_id: conversation.id
+                }).catch(console.error);
+            }
         } catch (error) {
-            console.error('Failed to suggest articles:', error);
+            console.error('Failed to analyze conversation:', error);
         } finally {
-            setLoading(false);
+            setAnalyzing(false);
         }
     };
 
-    const handleArticleClick = async (article) => {
+    const dismissSuggestion = (articleId) => {
+        setDismissed(prev => new Set([...prev, articleId]));
+        setSuggestions(prev => prev.filter(s => s.id !== articleId));
+    };
+
+    const trackArticleView = async (article) => {
         try {
             await base44.entities.KnowledgeArticle.update(article.id, {
-                access_count: (article.access_count || 0) + 1
+                access_count: (article.access_count || 0) + 1,
+                last_accessed: new Date().toISOString()
             });
+
+            await base44.entities.AgentKnowledgeAccess.create({
+                agent_name: conversation.agent_name || 'user',
+                knowledge_article_id: article.id,
+                access_type: 'read',
+                context: {
+                    conversation_id: conversation.id,
+                    triggered_by: 'realtime-suggestion'
+                }
+            }).catch(console.error);
         } catch (error) {
-            console.error('Failed to update access count:', error);
+            console.error('Failed to track access:', error);
         }
     };
 
-    if (suggestions.length === 0 && !loading) {
-        return null;
-    }
+    if (!visible || suggestions.length === 0) return null;
 
     return (
-        <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50">
-            <CardContent className="pt-4">
-                <div className="flex items-center gap-2 mb-3">
-                    <Sparkles className="h-5 w-5 text-blue-600" />
-                    <h3 className="font-semibold text-slate-800">Suggested Knowledge Articles</h3>
-                </div>
-                
-                {loading ? (
-                    <p className="text-sm text-slate-600">Analyzing context...</p>
-                ) : (
-                    <ScrollArea className="h-64">
-                        <div className="space-y-3">
-                            {suggestions.map((suggestion, idx) => (
-                                <div
-                                    key={idx}
-                                    onClick={() => handleArticleClick(suggestion.article)}
-                                    className="bg-white p-3 rounded-lg border border-slate-200 cursor-pointer hover:shadow-md transition-all"
-                                >
-                                    <div className="flex items-start justify-between mb-2">
-                                        <div className="flex items-center gap-2 flex-1">
-                                            <BookOpen className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                                            <h4 className="font-semibold text-sm text-slate-800">
-                                                {suggestion.article.title}
-                                            </h4>
-                                        </div>
-                                        <Badge className="bg-blue-600 flex-shrink-0">
-                                            {Math.round(suggestion.relevance_score * 100)}%
-                                        </Badge>
+        <div className="space-y-2">
+            {suggestions.map(article => (
+                <Card key={article.id} className="border-2 border-yellow-200 bg-yellow-50">
+                    <CardContent className="pt-3 pb-3">
+                        <div className="flex items-start gap-2">
+                            <Lightbulb className="h-4 w-4 text-yellow-600 mt-1 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-start justify-between gap-2 mb-1">
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className="font-semibold text-sm text-slate-800 truncate">
+                                            {article.title}
+                                        </h4>
+                                        <p className="text-xs text-slate-600 line-clamp-2 mb-1">
+                                            {article.relevance}
+                                        </p>
                                     </div>
-                                    <p className="text-xs text-slate-600 mb-2">
-                                        {suggestion.relevance_reason}
-                                    </p>
-                                    <div className="flex items-center gap-2">
-                                        <Badge variant="outline" className="text-xs">
-                                            {suggestion.article.category}
-                                        </Badge>
-                                        {suggestion.article.tags?.slice(0, 2).map((tag, i) => (
-                                            <Badge key={i} variant="outline" className="text-xs">
-                                                {tag}
-                                            </Badge>
-                                        ))}
-                                    </div>
+                                    <button
+                                        onClick={() => dismissSuggestion(article.id)}
+                                        className="text-slate-400 hover:text-slate-600"
+                                    >
+                                        <X className="h-3 w-3" />
+                                    </button>
                                 </div>
-                            ))}
+                                <div className="flex items-center gap-2">
+                                    <Badge variant="outline" className="text-xs">
+                                        {article.category}
+                                    </Badge>
+                                    <Badge className="bg-yellow-100 text-yellow-700 text-xs">
+                                        {Math.round(article.confidence * 100)}% match
+                                    </Badge>
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        className="h-6 px-2 text-xs"
+                                        onClick={() => {
+                                            trackArticleView(article);
+                                            window.open(`/KnowledgeBase?article=${article.id}`, '_blank');
+                                        }}
+                                    >
+                                        <ExternalLink className="h-3 w-3 mr-1" />
+                                        View
+                                    </Button>
+                                </div>
+                            </div>
                         </div>
-                    </ScrollArea>
-                )}
-            </CardContent>
-        </Card>
+                    </CardContent>
+                </Card>
+            ))}
+        </div>
     );
 }

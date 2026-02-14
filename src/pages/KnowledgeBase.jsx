@@ -11,6 +11,8 @@ import KnowledgeGapAnalysis from '../components/knowledge/KnowledgeGapAnalysis';
 import AIKnowledgeManager from '../components/knowledge/AIKnowledgeManager';
 import NaturalLanguageKnowledgeSearch from '../components/knowledge/NaturalLanguageKnowledgeSearch';
 import FrequentQuestionAnalyzer from '../components/knowledge/FrequentQuestionAnalyzer';
+import CentralKnowledgeAssistant from '../components/knowledge/CentralKnowledgeAssistant';
+import KnowledgeConsistencyChecker from '../components/knowledge/KnowledgeConsistencyChecker';
 
 export default function KnowledgeBasePage() {
     const [articles, setArticles] = useState([]);
@@ -97,29 +99,39 @@ export default function KnowledgeBasePage() {
                     </Button>
                 </div>
 
-                <Tabs defaultValue="ai-search">
+                <Tabs defaultValue="assistant">
                     <TabsList className="bg-white">
-                        <TabsTrigger value="ai-search">
+                        <TabsTrigger value="assistant">
                             <Brain className="h-4 w-4 mr-2" />
-                            AI Search
+                            Assistant
+                        </TabsTrigger>
+                        <TabsTrigger value="ai-search">
+                            <Search className="h-4 w-4 mr-2" />
+                            Search
                         </TabsTrigger>
                         <TabsTrigger value="browse">
                             <BookOpen className="h-4 w-4 mr-2" />
                             Browse
                         </TabsTrigger>
-                        <TabsTrigger value="questions">
-                            <Search className="h-4 w-4 mr-2" />
-                            Frequent Questions
-                        </TabsTrigger>
                         <TabsTrigger value="gaps">
                             <Brain className="h-4 w-4 mr-2" />
-                            Knowledge Gaps
+                            Gaps & Quality
                         </TabsTrigger>
                         <TabsTrigger value="trending">
                             <TrendingUp className="h-4 w-4 mr-2" />
                             Trending
                         </TabsTrigger>
                     </TabsList>
+
+                    <TabsContent value="assistant" className="space-y-6">
+                        <CentralKnowledgeAssistant 
+                            onNavigate={(page, params) => {
+                                if (params?.create) {
+                                    setShowEditor(true);
+                                }
+                            }}
+                        />
+                    </TabsContent>
 
                     <TabsContent value="ai-search" className="space-y-6">
                         <NaturalLanguageKnowledgeSearch 
@@ -183,6 +195,15 @@ export default function KnowledgeBasePage() {
 
                     <TabsContent value="gaps" className="space-y-6">
                         <AIKnowledgeManager onArticleGenerated={loadData} />
+                        <KnowledgeConsistencyChecker 
+                            articles={articles}
+                            onFixRequired={(issue, affectedArticles) => {
+                                if (affectedArticles.length > 0) {
+                                    setEditingArticle(affectedArticles[0]);
+                                    setShowEditor(true);
+                                }
+                            }}
+                        />
                         <KnowledgeGapAnalysis queries={queries} articles={articles} onCreateArticle={() => setShowEditor(true)} />
                     </TabsContent>
 
