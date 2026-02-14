@@ -13,7 +13,7 @@ export default function RealtimeArticleSuggester({ conversation, visible = true 
 
     useEffect(() => {
         if (conversation?.messages?.length > 0 && visible) {
-            analyzeCon versation();
+            analyzeConversation();
         }
     }, [conversation?.messages?.length, visible]);
 
