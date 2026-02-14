@@ -1,16 +1,20 @@
 // Refactored to modern React patterns with custom hooks and component extraction
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Plus, Activity } from 'lucide-react';
+import { Plus, Activity, Brain, Lightbulb, Target } from 'lucide-react';
 import CollaborationWorkspace from '../components/collaboration/CollaborationWorkspace';
 import NewCollaborationDialog from '../components/collaboration/NewCollaborationDialog';
 import CollaborationStats from '../components/collaboration/CollaborationStats';
 import SessionsList from '../components/collaboration/SessionsList';
 import { useCollaborationData } from '../components/collaboration/useCollaborationData.jsx';
+import AICollaborationEngine from '../components/collaboration/AICollaborationEngine';
+import ProactiveInsightSharing from '../components/collaboration/ProactiveInsightSharing';
+import SmartTaskDelegator from '../components/collaboration/SmartTaskDelegator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function AgentCollaborationHubPage() {
     // Custom hook handles all data fetching and state management
-    const { sessions, agents, loading, loadData, createSession } = useCollaborationData();
+    const { sessions, agents, skills, loading, loadData, createSession } = useCollaborationData();
     
     // Local UI state
     const [selectedSession, setSelectedSession] = useState(null);
@@ -76,20 +80,57 @@ export default function AgentCollaborationHubPage() {
                     </Button>
                 </div>
 
-                {/* Stats cards - extracted to separate component */}
-                <CollaborationStats sessions={sessions} agentsCount={agents.length} />
+                {/* Tabs for different collaboration features */}
+                <Tabs defaultValue="sessions" className="space-y-6">
+                    <TabsList className="bg-white">
+                        <TabsTrigger value="sessions">
+                            <Activity className="h-4 w-4 mr-2" />
+                            Sessions
+                        </TabsTrigger>
+                        <TabsTrigger value="ai-engine">
+                            <Brain className="h-4 w-4 mr-2" />
+                            AI Engine
+                        </TabsTrigger>
+                        <TabsTrigger value="insights">
+                            <Lightbulb className="h-4 w-4 mr-2" />
+                            Insights
+                        </TabsTrigger>
+                        <TabsTrigger value="delegation">
+                            <Target className="h-4 w-4 mr-2" />
+                            Task Delegation
+                        </TabsTrigger>
+                    </TabsList>
 
-                {/* Sessions list - extracted to separate component */}
-                <div>
-                    <h2 className="text-xl font-semibold text-slate-800 mb-4">
-                        Collaboration Sessions
-                    </h2>
-                    <SessionsList 
-                        sessions={sessions}
-                        onSelectSession={setSelectedSession}
-                        onCreateSession={() => setShowNewDialog(true)}
-                    />
-                </div>
+                    <TabsContent value="sessions" className="space-y-6">
+                        <CollaborationStats sessions={sessions} agentsCount={agents.length} />
+                        <div>
+                            <h2 className="text-xl font-semibold text-slate-800 mb-4">
+                                Collaboration Sessions
+                            </h2>
+                            <SessionsList 
+                                sessions={sessions}
+                                onSelectSession={setSelectedSession}
+                                onCreateSession={() => setShowNewDialog(true)}
+                            />
+                        </div>
+                    </TabsContent>
+
+                    <TabsContent value="ai-engine">
+                        <AICollaborationEngine
+                            agents={agents}
+                            skills={skills}
+                            collaborationSessions={sessions}
+                        />
+                    </TabsContent>
+
+                    <TabsContent value="insights">
+                        <ProactiveInsightSharing agents={agents} />
+                    </TabsContent>
+
+                    <TabsContent value="delegation">
+                        <SmartTaskDelegator agents={agents} skills={skills} />
+                    </TabsContent>
+                </Tabs>
 
                 {/* New collaboration dialog */}
                 <NewCollaborationDialog
