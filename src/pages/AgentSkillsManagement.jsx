@@ -3,7 +3,9 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, Search, Plus, TrendingUp, Book, Shield, Users, Target } from 'lucide-react';
+import { Brain, Search, Plus, TrendingUp, Book, Shield, Users, Target, GraduationCap } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import AgentSkillMatrix from '../components/skills/AgentSkillMatrix';
 import SkillDefinitionManager from '../components/skills/SkillDefinitionManager';
 import KnowledgeAccessDashboard from '../components/skills/KnowledgeAccessDashboard';
@@ -112,6 +114,12 @@ export default function AgentSkillsManagementPage() {
                             Manage agent capabilities and shared knowledge base
                         </p>
                     </div>
+                    <Link to={createPageUrl('TrainingHub')}>
+                        <Button className="bg-gradient-to-r from-blue-600 to-purple-600">
+                            <GraduationCap className="h-4 w-4 mr-2" />
+                            Training Hub
+                        </Button>
+                    </Link>
                 </div>
 
                 {/* Search */}
