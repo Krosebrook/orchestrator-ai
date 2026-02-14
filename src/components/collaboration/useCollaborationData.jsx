@@ -6,6 +6,7 @@ import { base44 } from "@/api/base44Client";
 export function useCollaborationData() {
     const [sessions, setSessions] = useState([]);
     const [agents, setAgents] = useState([]);
+    const [skills, setSkills] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
