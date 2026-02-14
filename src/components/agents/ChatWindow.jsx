@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import RealtimeArticleSuggester from '../knowledge/RealtimeArticleSuggester';
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -111,8 +110,8 @@ export default function ChatWindow({ conversation, agent }) {
                     <div className="lg:col-span-1">
                         <div className="sticky top-4">
                             <RealtimeArticleSuggester 
-                                conversationId={conversation?.id}
-                                currentMessages={messages}
+                                conversation={{ ...conversation, messages }}
+                                visible={messages.length > 0}
                             />
                         </div>
                     </div>
