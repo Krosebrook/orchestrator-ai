@@ -278,6 +278,10 @@ export default function WorkflowsPage() {
                             <Sparkles className="h-4 w-4 mr-2" />
                             Approvals
                         </TabsTrigger>
+                        <TabsTrigger value="optimization">
+                            <Sparkles className="h-4 w-4 mr-2" />
+                            Optimization
+                        </TabsTrigger>
                     </TabsList>
 
                     {/* AI Generator Tab */}
@@ -384,6 +388,19 @@ export default function WorkflowsPage() {
                     {/* Approvals Tab */}
                     <TabsContent value="approvals">
                         <WorkflowApprovalPanel />
+                    </TabsContent>
+
+                    {/* Optimization Tab */}
+                    <TabsContent value="optimization">
+                        <div className="space-y-6">
+                            <ProactiveWorkflowOptimizer
+                                workflows={workflows}
+                                executions={executions}
+                            />
+                            <ABTestManager
+                                optimizations={[]}
+                            />
+                        </div>
                     </TabsContent>
 
                     {/* Executions Tab */}
