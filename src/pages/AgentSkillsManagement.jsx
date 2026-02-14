@@ -3,13 +3,14 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, Search, Plus, TrendingUp, Book, Shield, Users } from 'lucide-react';
+import { Brain, Search, Plus, TrendingUp, Book, Shield, Users, Target } from 'lucide-react';
 import AgentSkillMatrix from '../components/skills/AgentSkillMatrix';
 import SkillDefinitionManager from '../components/skills/SkillDefinitionManager';
 import KnowledgeAccessDashboard from '../components/skills/KnowledgeAccessDashboard';
 import SkillLearningAnalytics from '../components/skills/SkillLearningAnalytics';
 import SkillVerificationPanel from '../components/skills/SkillVerificationPanel';
 import CrossAgentSkillComparison from '../components/skills/CrossAgentSkillComparison';
+import SkillDevelopmentPathPlanner from '../components/skills/SkillDevelopmentPathPlanner';
 import { toast } from 'sonner';
 
 export default function AgentSkillsManagementPage() {
@@ -17,6 +18,8 @@ export default function AgentSkillsManagementPage() {
     const [skills, setSkills] = useState([]);
     const [knowledgeAccess, setKnowledgeAccess] = useState([]);
     const [knowledgeArticles, setKnowledgeArticles] = useState([]);
+    const [trainingModules, setTrainingModules] = useState([]);
+    const [trainingDatasets, setTrainingDatasets] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
     const [selectedAgent, setSelectedAgent] = useState(null);
@@ -27,17 +30,21 @@ export default function AgentSkillsManagementPage() {
 
     const loadData = async () => {
         try {
-            const [agentsList, skillsList, accessList, articlesList] = await Promise.all([
+            const [agentsList, skillsList, accessList, articlesList, modulesList, datasetsList] = await Promise.all([
                 base44.agents.listAgents(),
                 base44.entities.AgentSkill.list('-updated_date'),
                 base44.entities.AgentKnowledgeAccess.list('-created_date', 100),
-                base44.entities.KnowledgeArticle.list('-updated_date')
+                base44.entities.KnowledgeArticle.list('-updated_date'),
+                base44.entities.TrainingModule.list('-created_date').catch(() => []),
+                base44.entities.TrainingDataset.list('-created_date').catch(() => [])
             ]);
             
             setAgents(agentsList || []);
             setSkills(skillsList || []);
             setKnowledgeAccess(accessList || []);
             setKnowledgeArticles(articlesList || []);
+            setTrainingModules(modulesList || []);
+            setTrainingDatasets(datasetsList || []);
         } catch (error) {
             console.error('Failed to load data:', error);
             toast.error('Failed to load skills data');
@@ -129,6 +136,10 @@ export default function AgentSkillsManagementPage() {
                             <Users className="h-4 w-4 mr-2" />
                             Compare
                         </TabsTrigger>
+                        <TabsTrigger value="development">
+                            <Target className="h-4 w-4 mr-2" />
+                            Development Paths
+                        </TabsTrigger>
                         <TabsTrigger value="manage">
                             <Plus className="h-4 w-4 mr-2" />
                             Manage Skills
@@ -162,6 +173,16 @@ export default function AgentSkillsManagementPage() {
                         <CrossAgentSkillComparison
                             agents={agents}
                             skills={skills}
+                        />
+                    </TabsContent>
+
+                    {/* Development Paths Tab */}
+                    <TabsContent value="development">
+                        <SkillDevelopmentPathPlanner
+                            agents={agents}
+                            skills={skills}
+                            trainingModules={trainingModules}
+                            trainingDatasets={trainingDatasets}
                         />
                     </TabsContent>
 
