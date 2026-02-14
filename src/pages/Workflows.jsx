@@ -16,6 +16,8 @@ import TemplateCustomizer from '../components/workflows/TemplateCustomizer';
 import WorkflowOptimizationAssistant from '../components/workflows/WorkflowOptimizationAssistant';
 import PerformanceAnalysisEngine from '../components/workflows/PerformanceAnalysisEngine';
 import WorkflowApprovalPanel from '../components/workflows/WorkflowApprovalPanel';
+import ProactiveWorkflowOptimizer from '../components/optimization/ProactiveWorkflowOptimizer';
+import ABTestManager from '../components/optimization/ABTestManager';
 import WorkflowOptimizationEngine from '../components/workflows/WorkflowOptimizationEngine';
 import { toast } from 'sonner';
 
