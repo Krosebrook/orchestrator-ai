@@ -26,11 +26,8 @@ export default function TrainingHubPage() {
     const [datasets, setDatasets] = useState([]);
     const [progressData, setProgressData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [selectedAgent, setSelectedAgent] = useState(null);
-    const [selectedSkill, setSelectedSkill] = useState(null);
-    const [agents, setAgents] = useState([]);
-    const [skills, setSkills] = useState([]);
     const [showModuleCreator, setShowModuleCreator] = useState(false);
+    const [skills, setSkills] = useState([]);
     const [selectedModule, setSelectedModule] = useState(null);
     const [activeSimulation, setActiveSimulation] = useState(null);
     const [selectedAgentForCoaching, setSelectedAgentForCoaching] = useState(null);
