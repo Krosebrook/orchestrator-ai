@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { GraduationCap, Plus, BookOpen, Target, TrendingUp, Database, Play, Award } from 'lucide-react';
+import { GraduationCap, Plus, BookOpen, Target, TrendingUp, Database, Play, Award, Zap, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import TrainingModuleCreator from '../components/training/TrainingModuleCreator';
 import TrainingModuleCard from '../components/training/TrainingModuleCard';
@@ -17,6 +17,8 @@ import AgentTrainingModule from '../components/training/AgentTrainingModule';
 import SkillImprovementTracker from '../components/training/SkillImprovementTracker';
 import AITrainingSuggestions from '../components/training/AITrainingSuggestions';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import PersonalizedLearningPath from '../components/training/PersonalizedLearningPath';
+import SimulationEngine from '../components/training/SimulationEngine';
 
 export default function TrainingHubPage() {
     const [agents, setAgents] = useState([]);
@@ -31,6 +33,8 @@ export default function TrainingHubPage() {
     const [selectedModule, setSelectedModule] = useState(null);
     const [activeSimulation, setActiveSimulation] = useState(null);
     const [selectedAgentForCoaching, setSelectedAgentForCoaching] = useState(null);
+    const [selectedAgent, setSelectedAgent] = useState(null);
+    const [selectedSkill, setSelectedSkill] = useState(null);
 
     useEffect(() => {
         loadData();
@@ -38,13 +42,14 @@ export default function TrainingHubPage() {
 
     const loadData = async () => {
         try {
-            const [agentsList, modulesList, sessionsList, recsList, datasetsList, progressList] = await Promise.all([
+            const [agentsList, modulesList, sessionsList, recsList, datasetsList, progressList, skillsList] = await Promise.all([
                 base44.agents.listAgents(),
                 base44.entities.TrainingModule.list('-updated_date'),
                 base44.entities.TrainingSession.list('-created_date', 100),
-                base44.entities.TrainingRecommendation.filter({ status: 'pending' }),
+                base44.entities.TrainingRecommendation.filter({ status: 'pending' }).catch(() => []),
                 base44.entities.TrainingDataset.list('-updated_date'),
-                base44.entities.AgentTrainingProgress.list('-updated_date')
+                base44.entities.AgentTrainingProgress.list('-updated_date'),
+                base44.entities.AgentSkill.list('-updated_date')
             ]);
 
             setAgents(agentsList || []);
@@ -53,6 +58,11 @@ export default function TrainingHubPage() {
             setRecommendations(recsList || []);
             setDatasets(datasetsList || []);
             setProgressData(progressList || []);
+            setSkills(skillsList || []);
+            
+            if (agentsList.length > 0 && !selectedAgent) {
+                setSelectedAgent(agentsList[0]);
+            }
         } catch (error) {
             console.error('Failed to load data:', error);
             toast.error('Failed to load training data');
@@ -174,55 +184,88 @@ export default function TrainingHubPage() {
                     </Card>
                 </div>
 
-                <Tabs defaultValue="datasets">
+                {/* Agent Selection */}
+                <div className="flex items-center gap-4">
+                    <Select value={selectedAgent?.name} onValueChange={(name) => {
+                        const agent = agents.find(a => a.name === name);
+                        setSelectedAgent(agent);
+                        setSelectedSkill(null);
+                    }}>
+                        <SelectTrigger className="w-64">
+                            <SelectValue placeholder="Select agent" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {agents.map(agent => (
+                                <SelectItem key={agent.name} value={agent.name}>
+                                    {agent.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <Tabs defaultValue="learning-path" className="space-y-6">
                     <TabsList className="bg-white">
-                        <TabsTrigger value="datasets">
-                            <Database className="h-4 w-4 mr-2" />
-                            Datasets
+                        <TabsTrigger value="learning-path">
+                            <Target className="h-4 w-4 mr-2" />
+                            Learning Path
                         </TabsTrigger>
-                        <TabsTrigger value="training">
-                            <Play className="h-4 w-4 mr-2" />
-                            Training
+                        <TabsTrigger value="simulation">
+                            <Zap className="h-4 w-4 mr-2" />
+                            Simulations
                         </TabsTrigger>
-                        <TabsTrigger value="improvement">
-                            <Award className="h-4 w-4 mr-2" />
+                        <TabsTrigger value="modules">
+                            <BookOpen className="h-4 w-4 mr-2" />
+                            Modules
+                        </TabsTrigger>
+                        <TabsTrigger value="analytics">
+                            <TrendingUp className="h-4 w-4 mr-2" />
                             Progress
                         </TabsTrigger>
-                        <TabsTrigger value="predictive">Future Skills</TabsTrigger>
-                        <TabsTrigger value="modules">Modules</TabsTrigger>
-                        <TabsTrigger value="coaching">AI Coaching</TabsTrigger>
-                        <TabsTrigger value="recommendations">Recommendations</TabsTrigger>
-                        <TabsTrigger value="analytics">Analytics</TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="datasets" className="mt-6">
-                        <TrainingDatasetManager 
-                            agents={agents}
-                            onDatasetCreated={loadData}
+                    <TabsContent value="learning-path" className="space-y-6">
+                        <PersonalizedLearningPath 
+                            agent={selectedAgent}
+                            onModuleSelect={(moduleId) => {
+                                const module = modules.find(m => m.id === moduleId);
+                                if (module) {
+                                    toast.success(`Opening: ${module.name}`);
+                                }
+                            }}
                         />
                     </TabsContent>
 
-                    <TabsContent value="training" className="mt-6 space-y-6">
-                        <AgentTrainingModule 
-                            agents={agents}
-                            datasets={datasets}
-                            onTrainingComplete={loadData}
-                        />
-                        <AITrainingSuggestions 
-                            agents={agents}
-                            progressData={progressData}
-                        />
+                    <TabsContent value="simulation" className="space-y-6">
+                        {selectedAgent && (
+                            <div className="space-y-4">
+                                <Select value={selectedSkill?.id} onValueChange={(id) => {
+                                    const skill = skills.find(s => s.id === id);
+                                    setSelectedSkill(skill);
+                                }}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Select skill to practice" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {skills.filter(s => s.agent_name === selectedAgent?.name).map(skill => (
+                                            <SelectItem key={skill.id} value={skill.id}>
+                                                {skill.skill_name} - {skill.proficiency_level}%
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+
+                                {selectedSkill && (
+                                    <SimulationEngine 
+                                        agent={selectedAgent}
+                                        skill={selectedSkill}
+                                    />
+                                )}
+                            </div>
+                        )}
                     </TabsContent>
 
-                    <TabsContent value="improvement" className="mt-6">
-                        <SkillImprovementTracker agents={agents} />
-                    </TabsContent>
-
-                    <TabsContent value="predictive" className="mt-6">
-                        <PredictiveSkillGapAnalyzer agents={agents} />
-                    </TabsContent>
-
-                    <TabsContent value="modules" className="mt-6 space-y-6">
+                    <TabsContent value="modules" className="space-y-6">
                         {modules.length === 0 ? (
                             <Card>
                                 <CardContent className="pt-12 pb-12 text-center">
@@ -247,41 +290,7 @@ export default function TrainingHubPage() {
                         )}
                     </TabsContent>
 
-                    <TabsContent value="coaching" className="mt-6 space-y-6">
-                        <Card>
-                            <CardContent className="pt-4">
-                                <div className="flex items-center gap-3">
-                                    <label className="text-sm font-medium">Select Agent for Coaching:</label>
-                                    <Select value={selectedAgentForCoaching} onValueChange={setSelectedAgentForCoaching}>
-                                        <SelectTrigger className="w-64">
-                                            <SelectValue placeholder="Choose agent" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {agents.map(agent => (
-                                                <SelectItem key={agent.name} value={agent.name}>
-                                                    {agent.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </CardContent>
-                        </Card>
-                        
-                        {selectedAgentForCoaching && (
-                            <AICoachingSystem agentName={selectedAgentForCoaching} />
-                        )}
-                    </TabsContent>
-
-                    <TabsContent value="recommendations" className="mt-6">
-                        <TrainingRecommendations
-                            agents={agents}
-                            modules={modules}
-                            onRecommendationAccepted={loadData}
-                        />
-                    </TabsContent>
-
-                    <TabsContent value="analytics" className="mt-6">
+                    <TabsContent value="analytics" className="space-y-6">
                         <TrainingAnalytics sessions={sessions} modules={modules} agents={agents} />
                     </TabsContent>
                 </Tabs>
