@@ -19,6 +19,9 @@ import AITrainingSuggestions from '../components/training/AITrainingSuggestions'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import PersonalizedLearningPath from '../components/training/PersonalizedLearningPath';
 import SimulationEngine from '../components/training/SimulationEngine';
+import AIModuleGenerator from '../components/training/AIModuleGenerator';
+import AIQuizGenerator from '../components/training/AIQuizGenerator';
+import AIScenarioGenerator from '../components/training/AIScenarioGenerator';
 
 export default function TrainingHubPage() {
     const [agents, setAgents] = useState([]);
@@ -210,6 +213,10 @@ export default function TrainingHubPage() {
                             <Target className="h-4 w-4 mr-2" />
                             Learning Path
                         </TabsTrigger>
+                        <TabsTrigger value="ai-content">
+                            <Sparkles className="h-4 w-4 mr-2" />
+                            AI Generator
+                        </TabsTrigger>
                         <TabsTrigger value="simulation">
                             <Zap className="h-4 w-4 mr-2" />
                             Simulations
@@ -234,6 +241,35 @@ export default function TrainingHubPage() {
                                 }
                             }}
                         />
+                    </TabsContent>
+
+                    <TabsContent value="ai-content" className="space-y-6">
+                        <Tabs defaultValue="modules" className="space-y-4">
+                            <TabsList>
+                                <TabsTrigger value="modules">Module Generator</TabsTrigger>
+                                <TabsTrigger value="quiz">Quiz Generator</TabsTrigger>
+                                <TabsTrigger value="scenarios">Scenario Generator</TabsTrigger>
+                            </TabsList>
+
+                            <TabsContent value="modules">
+                                <AIModuleGenerator 
+                                    agents={agents}
+                                    skills={skills}
+                                    onModuleCreated={loadData}
+                                />
+                            </TabsContent>
+
+                            <TabsContent value="quiz">
+                                <AIQuizGenerator skills={skills} />
+                            </TabsContent>
+
+                            <TabsContent value="scenarios">
+                                <AIScenarioGenerator 
+                                    skills={skills}
+                                    onScenarioCreated={loadData}
+                                />
+                            </TabsContent>
+                        </Tabs>
                     </TabsContent>
 
                     <TabsContent value="simulation" className="space-y-6">
